@@ -108,12 +108,12 @@
         </div>
     @else
         @foreach ($posts as $post)
-            <article class="card" wire:key="post-{{ $post->id }}">
+            <article id="post-{{ $post->id }}" class="card scroll-mt-20" wire:key="post-{{ $post->id }}">
                 <div class="flex items-start gap-3">
                     <x-pixel :name="$post->type->sprite()" class="w-9 shrink-0" />
                     <div class="min-w-0 flex-1">
                         <div class="flex flex-wrap items-center gap-2">
-                            <x-ui.badge>{{ $post->type->label() }}</x-ui.badge>
+                            <x-ui.badge>{{ $post->liveQuiz?->isQuestionGame() ? 'Se Pergunta' : $post->type->label() }}</x-ui.badge>
                             @if ($post->subject)
                                 <x-ui.badge tone="muted">{{ $post->subject->name }}</x-ui.badge>
                             @endif
@@ -131,10 +131,15 @@
                     <p class="mt-3 text-sm font-semibold">Entrega até {{ $post->due_on->format('d/m/Y') }}</p>
                 @endif
 
-                @if ($post->url || $post->file_path || $post->quiz_id)
+                @if ($post->url || $post->file_path || $post->quiz_id || $post->liveQuiz)
                     <div class="mt-3 flex flex-wrap gap-3">
                         @if ($post->quiz_id)
                             <x-ui.button :href="route('quizzes.show', $post->quiz_id)">Abrir quiz</x-ui.button>
+                        @endif
+                        @if ($post->liveQuiz)
+                            <x-ui.button :href="route('quizzes.live', $post->liveQuiz)">
+                                {{ $post->liveQuiz->phase === \App\Models\LiveQuiz::FINISHED ? 'Ver resultado da partida' : ($canManage ? 'Abrir partida' : 'Entrar na partida') }}
+                            </x-ui.button>
                         @endif
                         @if ($post->url)
                             <a class="btn-px btn-sm btn-secondary" href="{{ $post->url }}" target="_blank" rel="noopener noreferrer">Abrir link<span class="sr-only"> (abre em nova aba)</span></a>
@@ -143,6 +148,10 @@
                             <a class="btn-px btn-sm btn-secondary max-w-full" href="{{ route('posts.attachment', $post) }}"><span class="truncate">Baixar {{ $post->file_name }}</span></a>
                         @endif
                     </div>
+                @endif
+
+                @if ($post->type->acceptsResponses())
+                    <livewire:classrooms.participation :post="$post" :key="'participation-'.$post->id" />
                 @endif
 
                 <div class="mt-4 flex flex-wrap items-center justify-between gap-3 border-t-2 border-noite/10 pt-3">
@@ -157,7 +166,11 @@
                             <x-slot:trigger>
                                 <button type="button" class="btn-quiet text-sm text-erro">Remover<span class="sr-only"> {{ $post->title }}</span></button>
                             </x-slot:trigger>
-                            Ela some do mural e o arquivo é apagado.
+                            @if ($post->type->acceptsResponses())
+                                A publicação e as respostas recebidas serão apagadas.
+                            @else
+                                Ela some do mural e o arquivo é apagado.
+                            @endif
                         </x-ui.confirm>
                     @endif
                 </div>

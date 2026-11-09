@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-#[Fillable(['author_id', 'subject_id', 'quiz_id', 'type', 'title', 'body', 'url', 'file_path', 'file_name', 'due_on'])]
+#[Fillable(['author_id', 'subject_id', 'quiz_id', 'live_quiz_id', 'tool_key', 'type', 'title', 'body', 'url', 'file_path', 'file_name', 'due_on', 'poll_options'])]
 class Post extends Model
 {
     /** @use HasFactory<PostFactory> */
@@ -25,6 +25,8 @@ class Post extends Model
     {
         return [
             'due_on' => 'date',
+            'closed_at' => 'datetime',
+            'poll_options' => 'array',
             'type' => PostType::class,
         ];
     }
@@ -59,6 +61,12 @@ class Post extends Model
     public function quiz(): BelongsTo
     {
         return $this->belongsTo(Quiz::class);
+    }
+
+    /** @return BelongsTo<LiveQuiz, $this> */
+    public function liveQuiz(): BelongsTo
+    {
+        return $this->belongsTo(LiveQuiz::class);
     }
 
     /**

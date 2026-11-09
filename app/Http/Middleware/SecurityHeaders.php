@@ -21,6 +21,10 @@ class SecurityHeaders
         $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
         $response->headers->set('Referrer-Policy', 'same-origin');
 
+        if ($request->user()) {
+            $response->headers->set('Cache-Control', 'no-store, private');
+        }
+
         return $response;
     }
 }

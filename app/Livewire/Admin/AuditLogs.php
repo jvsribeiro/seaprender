@@ -15,30 +15,7 @@ class AuditLogs extends Component
 {
     use WithPagination;
 
-    public const LABELS = [
-        'auth.login' => 'Entrou no sistema',
-        'auth.failed' => 'Errou a senha',
-        'classroom.viewed' => 'Abriu a turma',
-        'classroom.created' => 'Turma criada',
-        'classroom.updated' => 'Turma editada',
-        'classroom.status_changed' => 'Situação da turma alterada',
-        'classroom.code_regenerated' => 'Código da turma trocado',
-        'enrollment.joined' => 'Aluno entrou na turma',
-        'enrollment.added' => 'Aluno matriculado',
-        'enrollment.removed' => 'Aluno removido',
-        'enrollment.imported' => 'Importação de alunos',
-        'post.published' => 'Publicou no mural',
-        'post.removed' => 'Removeu do mural',
-        'post.downloaded' => 'Baixou um arquivo',
-        'quiz.saved' => 'Salvou um quiz',
-        'quiz.published' => 'Publicou um quiz',
-        'quiz.answered' => 'Respondeu um quiz',
-        'quiz.removed' => 'Excluiu um quiz',
-        'user.role_changed' => 'Perfil alterado',
-        'user.password_reset' => 'Senha temporária gerada',
-        'user.password_changed' => 'Trocou a senha',
-        'user.deleted' => 'Conta excluída',
-    ];
+    public const LABELS = AuditLog::LABELS;
 
     #[Url(as: 'acao', except: '')]
     public string $action = '';

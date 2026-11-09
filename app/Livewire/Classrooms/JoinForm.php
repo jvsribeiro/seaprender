@@ -10,6 +10,8 @@ use Livewire\Component;
 
 class JoinForm extends Component
 {
+    use RedirectsAfterEnrollment;
+
     public string $code = '';
 
     public function join(JoinClassroom $joinClassroom): void
@@ -18,11 +20,7 @@ class JoinForm extends Component
 
         /** @var User $user */
         $user = Auth::user();
-        $enrollment = $joinClassroom->handle($user, $this->code);
-
-        session()->flash('toast', 'Você entrou na turma.');
-
-        $this->redirectRoute('classrooms.show', $enrollment->classroom_id, navigate: true);
+        $this->redirectAfterEnrollment($joinClassroom->handle($user, $this->code));
     }
 
     public function render(): View

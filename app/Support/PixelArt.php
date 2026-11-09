@@ -17,6 +17,27 @@ final class PixelArt
     ];
 
     private const SPRITES = [
+        'eye' => [
+            '....wwww....',
+            '..ww....ww..',
+            '.w...ww...w.',
+            'w...wwww...w',
+            '.w...ww...w.',
+            '..ww....ww..',
+            '....wwww....',
+        ],
+        'clipboard' => [
+            '...wwww...',
+            '.www..www.',
+            '.wwwwwwww.',
+            '.w......w.',
+            '.w.wwww.w.',
+            '.w......w.',
+            '.w.wwww.w.',
+            '.w......w.',
+            '.w.wwww.w.',
+            '.wwwwwwww.',
+        ],
         'home' => [
             '.....ww.....',
             '....wwww....',

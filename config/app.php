@@ -95,6 +95,8 @@ return [
 
     'demo_password' => env('DEMO_PASSWORD', 'se-aprender-demo'),
 
+    'classroom_open_enrollment' => env('CLASSROOM_OPEN_ENROLLMENT', in_array(env('APP_ENV', 'production'), ['local', 'testing'], true)),
+
     /*
     |--------------------------------------------------------------------------
     | Encryption Key

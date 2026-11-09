@@ -1,4 +1,4 @@
-<div class="card">
+<div class="card min-w-0">
     <div class="flex flex-wrap items-center justify-between gap-3">
         <h2 class="font-marca text-xl font-semibold text-azul">Acessos da turma</h2>
         <label class="flex items-center gap-2 text-sm font-medium">

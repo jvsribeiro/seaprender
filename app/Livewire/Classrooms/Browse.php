@@ -18,7 +18,7 @@ use Livewire\WithPagination;
 #[Title('Procurar turmas')]
 class Browse extends Component
 {
-    use WithPagination;
+    use RedirectsAfterEnrollment, WithPagination;
 
     #[Url(as: 'busca', except: '')]
     public string $search = '';
@@ -36,27 +36,29 @@ class Browse extends Component
     public function enroll(int $classroomId, EnrollInClassroom $enrollInClassroom): void
     {
         Gate::authorize('enroll', Classroom::class);
+        abort_unless(config('app.classroom_open_enrollment'), 403);
 
         $classroom = Classroom::findOrFail($classroomId);
 
-        $enrollInClassroom->handle($this->user(), $classroom);
-
-        session()->flash('toast', 'Inscrição feita.');
-
-        $this->redirectRoute('classrooms.show', $classroom, navigate: true);
+        $this->redirectAfterEnrollment($enrollInClassroom->handle($this->user(), $classroom));
     }
 
     public function render(): View
     {
+        Gate::authorize('enroll', Classroom::class);
+
         $user = $this->user();
         $term = "%{$this->search}%";
+        $openEnrollment = config('app.classroom_open_enrollment');
 
         return view('livewire.classrooms.browse', [
+            'openEnrollment' => $openEnrollment,
             'classrooms' => Classroom::query()
-                ->with('teacher:id,name')
+                ->with(['teacher:id,name', 'enrollments' => fn ($query) => $query->where('user_id', $user->id)])
                 ->withCount('activeEnrollments')
-                ->withExists(['activeEnrollments as enrolled' => fn ($query) => $query->where('user_id', $user->id)])
                 ->where('status', ClassroomStatus::Active)
+                ->when(! $openEnrollment, fn ($query) => $query
+                    ->whereHas('enrollments', fn ($enrollments) => $enrollments->where('user_id', $user->id)))
                 ->whereDoesntHave('enrollments', fn ($query) => $query
                     ->where('user_id', $user->id)
                     ->where('status', EnrollmentStatus::Removed))

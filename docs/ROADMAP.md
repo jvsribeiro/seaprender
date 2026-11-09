@@ -34,11 +34,15 @@ Reverb, QR local, salas, lobby, projetor, ingresso, partida, timer, ranking, pó
 
 **Pronto quando:** professor e dois alunos em sessões distintas jogam até o pódio, e o teste de carga passa.
 
+A sala por matrícula já funciona com atualização periódica, perguntas com tempo, gabarito e classificação. O piloto em rede escolar deve medir o tempo de entrada e testar a partida com 50 alunos antes de avançar para QR, PIN e modo projetor.
+
 ## Fase 5 — Economia e loja (M)
 
 Livro-razão, regras por turma, tetos, participação rápida, crédito da partida, vínculo de convidado, loja, resgate, aprovação, estorno, histórico.
 
 **Pronto quando:** o critério de aceite completo roda de ponta a ponta. **Aqui o MVP fecha.**
+
+A lojinha já registra os pontos manuais por turma, o estoque, os pedidos, a entrega e os estornos. Os pontos da partida ficam na classificação. O professor decide quando conceder pontos da lojinha.
 
 ## Fase 6 — Avatares e assets (M)
 
@@ -71,3 +75,9 @@ Instalação limpa, auditoria de acessibilidade e performance, revisão de segur
 | Política LGPD com a coordenação | Antes de dados reais | Definir base legal, retenção e menores |
 | Recompensas ligadas a nota | Antes de habilitar | Mantidas bloqueadas |
 | Provedor de IA | Fase 9 | Opcional |
+
+## Próxima sequência sugerida
+
+1. Implementar a entrega de atividades, a devolutiva do professor e a lista de pendências do aluno. Hoje o progresso acompanha a participação já registrada.
+2. Rodar uma aula piloto com votação, quiz e reflexão. Medir entrada, recuperação após desconexão e desempenho com 50 jogadores na rede da escola.
+3. Usar o que aparecer no piloto para priorizar modo projetor, QR de entrada e filtros de progresso por matéria. Tratar recompensas automáticas e medalhas como uma etapa posterior.

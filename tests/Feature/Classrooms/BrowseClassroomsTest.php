@@ -3,7 +3,9 @@
 namespace Tests\Feature\Classrooms;
 
 use App\Enums\ClassroomStatus;
+use App\Enums\EnrollmentStatus;
 use App\Livewire\Classrooms\Browse;
+use App\Livewire\Classrooms\Show;
 use App\Models\Classroom;
 use App\Models\Enrollment;
 use App\Models\User;
@@ -15,7 +17,22 @@ class BrowseClassroomsTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_new_student_registers_finds_a_classroom_and_enrolls(): void
+    public function test_closed_catalog_hides_unenrolled_classes_and_refuses_direct_enrollment(): void
+    {
+        config(['app.classroom_open_enrollment' => false]);
+        $student = User::factory()->create();
+        $private = Classroom::factory()->create(['name' => 'Turma reservada de matemática']);
+        $own = Classroom::factory()->create(['name' => 'Turma da aluna']);
+        Enrollment::factory()->for($own)->for($student)->create();
+
+        Livewire::actingAs($student)->test(Browse::class)
+            ->assertSee($own->name)->assertDontSee($private->name)
+            ->call('enroll', $private->id)->assertForbidden();
+
+        $this->assertDatabaseMissing('enrollments', ['classroom_id' => $private->id, 'user_id' => $student->id]);
+    }
+
+    public function test_new_student_only_enters_a_classroom_after_the_teacher_approves(): void
     {
         $classroom = Classroom::factory()->create(['name' => 'Programação Web T1']);
 
@@ -32,11 +49,21 @@ class BrowseClassroomsTest extends TestCase
 
         Livewire::actingAs($student)->test(Browse::class)
             ->call('enroll', $classroom->id)
-            ->assertRedirect(route('classrooms.show', $classroom));
+            ->assertRedirect(route('classrooms.browse'));
 
-        $this->assertDatabaseHas('enrollments', ['classroom_id' => $classroom->id, 'user_id' => $student->id]);
-        $this->assertDatabaseHas('audit_logs', ['actor_id' => $student->id, 'action' => 'enrollment.joined']);
-        $this->get(route('classrooms.show', $classroom))->assertOk();
+        $enrollment = $classroom->pendingEnrollments()->sole();
+        $this->assertSame($student->id, $enrollment->user_id);
+        $this->assertDatabaseHas('audit_logs', ['actor_id' => $student->id, 'action' => 'enrollment.requested']);
+        $this->get(route('classrooms.browse'))->assertSee('Aguardando aprovação');
+        $this->get(route('classrooms.show', $classroom))->assertNotFound();
+
+        Livewire::actingAs($classroom->teacher)->test(Show::class, ['classroom' => $classroom])
+            ->set('tab', 'alunos')->assertSee('Solicitações de inscrição')
+            ->call('reviewEnrollment', $enrollment->id, true)->assertHasNoErrors()->assertDontSee('Solicitações de inscrição');
+
+        $this->assertSame(EnrollmentStatus::Active, $enrollment->refresh()->status);
+        $this->assertDatabaseHas('audit_logs', ['actor_id' => $classroom->teacher_id, 'action' => 'enrollment.approved']);
+        $this->actingAs($student)->get(route('classrooms.show', $classroom))->assertOk();
     }
 
     public function test_catalog_lists_open_classrooms_without_student_data(): void
@@ -80,7 +107,7 @@ class BrowseClassroomsTest extends TestCase
         $this->actingAs($enrollment->user)
             ->get(route('classrooms.browse'))
             ->assertSee('Abrir turma')
-            ->assertDontSee('Inscrever-se');
+            ->assertDontSeeHtml('wire:click="enroll('.$enrollment->classroom_id.')"');
     }
 
     public function test_enrolling_twice_keeps_one_enrollment(): void

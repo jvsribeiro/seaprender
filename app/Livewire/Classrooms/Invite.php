@@ -16,6 +16,8 @@ use Livewire\Component;
 #[Title('Convite de turma')]
 class Invite extends Component
 {
+    use RedirectsAfterEnrollment;
+
     #[Locked]
     public string $code = '';
 
@@ -28,17 +30,13 @@ class Invite extends Component
     {
         /** @var User $user */
         $user = Auth::user();
-        $enrollment = $joinClassroom->handle($user, $this->code);
-
-        session()->flash('toast', 'Você entrou na turma.');
-
-        $this->redirectRoute('classrooms.show', $enrollment->classroom_id, navigate: true);
+        $this->redirectAfterEnrollment($joinClassroom->handle($user, $this->code));
     }
 
     public function render(): View
     {
         return view('livewire.classrooms.invite', [
-            'classroom' => Classroom::with('teacher:id,name')
+            'classroom' => Classroom::with(['teacher:id,name', 'enrollments' => fn ($query) => $query->where('user_id', Auth::id())])
                 ->where('enrollment_code', $this->code)
                 ->where('status', ClassroomStatus::Active)
                 ->first(),

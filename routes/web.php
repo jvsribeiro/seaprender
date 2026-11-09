@@ -13,7 +13,9 @@ use App\Livewire\Classrooms\Index;
 use App\Livewire\Classrooms\Invite;
 use App\Livewire\Classrooms\Show;
 use App\Livewire\Dashboard;
+use App\Livewire\QuestionGames\Editor as QuestionGameEditor;
 use App\Livewire\Quizzes\Editor;
+use App\Livewire\Quizzes\LiveRoom;
 use App\Livewire\Quizzes\Play;
 use App\Livewire\Quizzes\Results;
 use Illuminate\Support\Facades\Route;
@@ -30,11 +32,14 @@ Route::middleware(['auth', TrackLastSeen::class, RequirePasswordChange::class])-
     Route::livewire('/turmas/{classroom}', Show::class)->whereNumber('classroom')->name('classrooms.show');
     Route::livewire('/turmas/{classroom}/editar', Form::class)->whereNumber('classroom')->name('classrooms.edit');
     Route::livewire('/turmas/{classroom}/quizzes/criar', Editor::class)->whereNumber('classroom')->name('quizzes.create');
+    Route::livewire('/turmas/{classroom}/se-pergunta/criar', QuestionGameEditor::class)->whereNumber('classroom')->name('question-games.create');
+    Route::livewire('/turmas/{classroom}/se-pergunta/{questionGame}/editar', QuestionGameEditor::class)->whereNumber(['classroom', 'questionGame'])->name('question-games.edit');
     Route::livewire('/convite/{code}', Invite::class)->name('invite');
 
     Route::livewire('/quizzes/{quiz}', Play::class)->whereNumber('quiz')->name('quizzes.show');
     Route::livewire('/quizzes/{quiz}/editar', Editor::class)->whereNumber('quiz')->name('quizzes.edit');
     Route::livewire('/quizzes/{quiz}/resultados', Results::class)->whereNumber('quiz')->name('quizzes.results');
+    Route::livewire('/ao-vivo/{liveQuiz}', LiveRoom::class)->whereNumber('liveQuiz')->name('quizzes.live');
 
     Route::get('/publicacoes/{post}/arquivo', PostAttachmentController::class)->whereNumber('post')->name('posts.attachment');
 

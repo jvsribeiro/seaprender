@@ -1,4 +1,4 @@
-<div>
+<x-classroom-theme :theme="$quiz->classroom->theme()" class="classroom-surface">
     <x-ui.page-header :title="$quiz->title" subtitle="Resultados" :breadcrumbs="[$quiz->classroom->name => route('classrooms.show', [$quiz->classroom, 'aba' => 'quizzes'])]" />
 
     <div class="mb-6 grid gap-4 sm:grid-cols-3">
@@ -38,4 +38,4 @@
             </ol>
         </x-ui.card>
     </div>
-</div>
+</x-classroom-theme>

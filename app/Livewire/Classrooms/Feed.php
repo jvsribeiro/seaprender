@@ -152,11 +152,13 @@ class Feed extends Component
 
     public function render(): View
     {
+        Gate::authorize('view', $this->classroom);
+
         $user = $this->user();
         $canManage = Gate::allows('manage', $this->classroom);
 
         $posts = $this->classroom->posts()
-            ->with(['author:id,name', 'subject:id,name', ...($canManage ? ['viewers:id'] : [])])
+            ->with(['author:id,name', 'subject:id,name', 'liveQuiz:id,phase,game_settings', ...($canManage ? ['viewers:id'] : [])])
             ->withCount('likers')
             ->withExists(['likers as liked' => fn ($query) => $query->where('users.id', $user->id)])
             ->when($this->filterSubject > 0, fn ($query) => $query->where('subject_id', $this->filterSubject))

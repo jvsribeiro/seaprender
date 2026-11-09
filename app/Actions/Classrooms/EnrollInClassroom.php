@@ -3,9 +3,11 @@
 namespace App\Actions\Classrooms;
 
 use App\Actions\RecordAuditLog;
+use App\Enums\EnrollmentStatus;
 use App\Models\Classroom;
 use App\Models\Enrollment;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class EnrollInClassroom
@@ -17,10 +19,6 @@ class EnrollInClassroom
      */
     public function handle(User $user, Classroom $classroom): Enrollment
     {
-        if (! $classroom->isActive()) {
-            $this->fail('Esta turma não está aceitando inscrições.');
-        }
-
         if ($classroom->teacher_id === $user->id) {
             $this->fail('Você é o professor desta turma.');
         }
@@ -29,20 +27,31 @@ class EnrollInClassroom
             $this->fail('Só contas de aluno podem se inscrever em turmas.');
         }
 
-        $enrollment = Enrollment::createOrFirst([
-            'classroom_id' => $classroom->id,
-            'user_id' => $user->id,
-        ]);
+        return DB::transaction(function () use ($user, $classroom) {
+            $classroom = Classroom::query()->lockForUpdate()->findOrFail($classroom->id);
+            if (! $classroom->isActive()) {
+                $this->fail('Esta turma não está aceitando inscrições.');
+            }
 
-        if (! $enrollment->wasRecentlyCreated && ! $enrollment->isActive()) {
-            $this->fail('Sua matrícula nesta turma foi encerrada. Fale com o professor.');
-        }
+            $enrollment = $classroom->enrollments()->firstOrCreate(
+                ['user_id' => $user->id],
+                ['status' => EnrollmentStatus::Pending],
+            );
 
-        if ($enrollment->wasRecentlyCreated) {
-            $this->recordAuditLog->handle($user, 'enrollment.joined', $enrollment);
-        }
+            if ($enrollment->status === EnrollmentStatus::Removed) {
+                $this->fail('Sua matrícula nesta turma foi encerrada. Fale com o professor.');
+            }
 
-        return $enrollment;
+            if ($enrollment->status === EnrollmentStatus::Rejected) {
+                $this->fail('Sua solicitação foi recusada. Fale com o professor.');
+            }
+
+            if ($enrollment->wasRecentlyCreated) {
+                $this->recordAuditLog->handle($user, 'enrollment.requested', $enrollment);
+            }
+
+            return $enrollment;
+        });
     }
 
     /**

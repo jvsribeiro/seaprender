@@ -16,6 +16,28 @@ class RosterTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_only_the_teacher_can_review_a_pending_request_and_rejection_keeps_access_closed(): void
+    {
+        $request = Enrollment::factory()->create(['status' => EnrollmentStatus::Pending]);
+        $classroom = $request->classroom;
+        $student = Enrollment::factory()->for($classroom)->create()->user;
+        $otherClassroom = Classroom::factory()->create();
+
+        Livewire::actingAs($otherClassroom->teacher)->test(Show::class, ['classroom' => $otherClassroom])
+            ->call('reviewEnrollment', $request->id, true)->assertNotFound();
+        Livewire::actingAs($student)->test(Show::class, ['classroom' => $classroom])
+            ->call('reviewEnrollment', $request->id, true)->assertForbidden();
+
+        Livewire::actingAs($classroom->teacher)->test(Show::class, ['classroom' => $classroom])
+            ->set('tab', 'alunos')->call('reviewEnrollment', $request->id, false)->assertHasNoErrors()
+            ->call('reviewEnrollment', $request->id, true)->assertHasNoErrors();
+
+        $this->assertSame(EnrollmentStatus::Rejected, $request->refresh()->status);
+        $this->assertDatabaseHas('audit_logs', ['classroom_id' => $classroom->id, 'action' => 'enrollment.rejected']);
+        $this->actingAs($request->user)->get(route('classrooms.browse'))->assertSee('Solicitação recusada');
+        $this->get(route('classrooms.show', $classroom))->assertNotFound();
+    }
+
     public function test_teacher_adds_a_new_student_by_email(): void
     {
         $classroom = Classroom::factory()->create();

@@ -1,6 +1,6 @@
 # Progresso
 
-Atualizado em 07/11/2026. Ao retomar, continuar pelo primeiro item aberto.
+Atualizado em 09/11/2026. Ao retomar, continuar pelo primeiro item aberto.
 
 ## Fase 0 — Base
 
@@ -85,3 +85,15 @@ Adiantado das fases 2, 3 e 9 a pedido do professor.
 - [ ] Content-Security-Policy
 
 Fases seguintes em [ROADMAP.md](ROADMAP.md).
+
+## Participação, progresso e identidade da turma
+
+- [x] Progresso por aluno e por turma com publicações abertas, quizzes e reflexões
+- [x] Resumos particulares e resultados recentes de partidas no progresso do aluno
+- [x] Reflexão de fim de aula e votação com um voto por aluno no mural
+- [x] Quiz ao vivo com sala de espera, tempo por pergunta, gabarito e classificação
+- [x] Sorteio de alunos sem repetição no ciclo e formação de grupos
+- [x] Lojinha com saldo por turma, catálogo, estoque, entrega e estorno
+- [x] Auditoria por turma para o professor com categorias, ícones e detalhes
+- [x] Paletas e padrões de fundo com prévia e personalização por turma
+- [ ] Piloto com rede da escola, modo projetor e teste de carga com 50 jogadores

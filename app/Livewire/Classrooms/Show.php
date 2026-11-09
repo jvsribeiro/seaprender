@@ -7,11 +7,13 @@ use App\Actions\Classrooms\EnrollStudent;
 use App\Actions\Classrooms\ImportStudents;
 use App\Actions\Classrooms\RegenerateEnrollmentCode;
 use App\Actions\Classrooms\RemoveStudent;
+use App\Actions\Classrooms\ReviewEnrollment;
 use App\Actions\RecordAuditLog;
 use App\Actions\Users\IssueTemporaryPassword;
 use App\Enums\ClassroomStatus;
 use App\Models\Classroom;
 use App\Models\User;
+use App\Support\ClassroomProgress;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
@@ -98,6 +100,17 @@ class Show extends Component
         $this->dispatch('toast', message: 'Aluno removido da turma.');
     }
 
+    public function reviewEnrollment(int $enrollmentId, bool $approve, ReviewEnrollment $review): void
+    {
+        $changed = $review->handle($this->user(), $this->classroom, $enrollmentId, $approve);
+
+        $this->dispatch('toast', message: match (true) {
+            ! $changed => 'Essa solicitação já foi analisada.',
+            $approve => 'Solicitação aprovada. O aluno já pode abrir a turma.',
+            default => 'Solicitação recusada.',
+        });
+    }
+
     public function resetStudentPassword(int $enrollmentId, IssueTemporaryPassword $issueTemporaryPassword): void
     {
         Gate::authorize('manage', $this->classroom);
@@ -137,18 +150,36 @@ class Show extends Component
 
     public function render(): View
     {
+        Gate::authorize('view', $this->classroom);
+
         $canManage = Gate::allows('manage', $this->classroom);
 
-        $tabs = ['mural' => 'Mural', 'quizzes' => 'Quizzes', ...($canManage ? ['alunos' => 'Alunos', 'acessos' => 'Acessos'] : [])];
+        $tabs = [
+            'mural' => 'Mural',
+            'progresso' => 'Progresso',
+            'quizzes' => 'Quizzes',
+            'se-pergunta' => 'Se Pergunta',
+            'loja' => 'Lojinha',
+            ...($canManage ? ['ferramentas' => 'Ferramentas', 'alunos' => 'Alunos', 'acessos' => 'Acessos', 'auditoria' => 'Auditoria'] : []),
+        ];
         $activeTab = array_key_exists($this->tab, $tabs) ? $this->tab : 'mural';
 
         return view('livewire.classrooms.show', [
             'canManage' => $canManage,
+            'theme' => $this->classroom->theme(),
             'tabs' => $tabs,
             'activeTab' => $activeTab,
+            'pendingCount' => $canManage ? $this->classroom->pendingEnrollments()->count() : 0,
+            'requests' => $activeTab === 'alunos'
+                ? $this->classroom->pendingEnrollments()->with('user:id,name,email')->oldest('id')->paginate(10, pageName: 'solicitacoes')
+                : null,
+            'progressTotals' => $activeTab === 'alunos' ? ClassroomProgress::totals($this->classroom) : null,
             'enrollments' => $activeTab === 'alunos'
                 ? $this->classroom->activeEnrollments()
-                    ->with('user:id,name,email')
+                    ->with(['user' => function ($relation) {
+                        $students = $relation->getQuery()->select(['users.id', 'users.name', 'users.email']);
+                        ClassroomProgress::addCounts($students, $this->classroom);
+                    }])
                     ->join('users', 'users.id', '=', 'enrollments.user_id')
                     ->select('enrollments.*')
                     ->orderBy('users.name')

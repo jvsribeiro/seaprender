@@ -1,7 +1,7 @@
 <div>
     <x-ui.page-header title="Trocar senha" :subtitle="$mustChange ? 'Crie uma senha sua para continuar.' : null" />
 
-    <form wire:submit="save" class="card grid max-w-md gap-4">
+    <form wire:submit="save" class="card grid w-full min-w-0 gap-4">
         @unless ($mustChange)
             <x-ui.input name="current_password" label="Senha atual" type="password" autocomplete="current-password" />
         @endunless

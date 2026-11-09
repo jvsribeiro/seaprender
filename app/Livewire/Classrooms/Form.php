@@ -6,6 +6,7 @@ use App\Actions\Classrooms\CreateClassroom;
 use App\Actions\Classrooms\UpdateClassroom;
 use App\Models\Classroom;
 use App\Models\User;
+use App\Support\ClassroomTheme;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -34,6 +35,14 @@ class Form extends Component
 
     public string $ends_on = '';
 
+    public string $theme_palette = 'classic';
+
+    public string $theme_pattern = 'grid';
+
+    public string $theme_base = '#004C94';
+
+    public string $theme_accent = '#F7941D';
+
     public function mount(?Classroom $classroom = null): void
     {
         if (! $classroom?->exists) {
@@ -51,6 +60,21 @@ class Form extends Component
         $this->period = $classroom->period;
         $this->starts_on = $classroom->starts_on->toDateString();
         $this->ends_on = $classroom->ends_on->toDateString();
+        $theme = $classroom->theme();
+        $this->theme_palette = $theme['palette'];
+        $this->theme_pattern = $theme['pattern'];
+        $this->theme_base = $theme['base'];
+        $this->theme_accent = $theme['accent'];
+    }
+
+    public function updatedThemePalette(string $palette): void
+    {
+        if (isset(ClassroomTheme::PRESETS[$palette])) {
+            $preset = ClassroomTheme::PRESETS[$palette];
+            $this->theme_pattern = $preset['pattern'];
+            $this->theme_base = $preset['base'];
+            $this->theme_accent = $preset['accent'];
+        }
     }
 
     /**
@@ -65,6 +89,10 @@ class Form extends Component
             'period' => ['required', Rule::in(self::PERIODS)],
             'starts_on' => ['required', 'date'],
             'ends_on' => ['required', 'date', 'after_or_equal:starts_on'],
+            'theme_palette' => ['required', Rule::in([...array_keys(ClassroomTheme::PRESETS), 'custom'])],
+            'theme_pattern' => ['required', Rule::in(array_keys(ClassroomTheme::PATTERNS))],
+            'theme_base' => ['exclude_unless:theme_palette,custom', 'required', ClassroomTheme::COLOR_RULE],
+            'theme_accent' => ['exclude_unless:theme_palette,custom', 'required', ClassroomTheme::COLOR_RULE],
         ];
     }
 
@@ -77,6 +105,7 @@ class Form extends Component
         Gate::authorize(...$classroom ? ['manage', $classroom] : ['create', Classroom::class]);
 
         $attributes = $this->validate();
+        $attributes += ['theme_base' => null, 'theme_accent' => null];
 
         $classroom = $classroom
             ? $updateClassroom->handle($user, $classroom, $attributes)
@@ -89,6 +118,11 @@ class Form extends Component
 
     public function render(): View
     {
-        return view('livewire.classrooms.form', ['periods' => self::PERIODS]);
+        return view('livewire.classrooms.form', [
+            'periods' => self::PERIODS,
+            'palettes' => ClassroomTheme::PRESETS,
+            'patterns' => ClassroomTheme::PATTERNS,
+            'preview' => ClassroomTheme::resolve($this->theme_palette, $this->theme_pattern, $this->theme_base, $this->theme_accent),
+        ]);
     }
 }

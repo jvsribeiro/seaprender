@@ -40,7 +40,7 @@ class Index extends Component
 
         $quiz = $this->classroom->quizzes()->findOrFail($quizId);
 
-        $recordAuditLog->handle($this->user(), 'quiz.removed', null, ['title' => $quiz->title]);
+        $recordAuditLog->handle($this->user(), 'quiz.removed', $quiz, ['title' => $quiz->title]);
 
         $quiz->delete();
 

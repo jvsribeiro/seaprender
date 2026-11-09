@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\ClassroomStatus;
 use App\Enums\EnrollmentStatus;
+use App\Support\ClassroomTheme;
 use Database\Factories\ClassroomFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -13,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'course', 'curricular_unit', 'period', 'starts_on', 'ends_on'])]
+#[Fillable(['name', 'course', 'curricular_unit', 'period', 'starts_on', 'ends_on', 'theme_palette', 'theme_pattern', 'theme_base', 'theme_accent'])]
 class Classroom extends Model
 {
     /** @use HasFactory<ClassroomFactory> */
@@ -66,6 +67,12 @@ class Classroom extends Model
         return $this->enrollments()->where('status', EnrollmentStatus::Active);
     }
 
+    /** @return HasMany<Enrollment, $this> */
+    public function pendingEnrollments(): HasMany
+    {
+        return $this->enrollments()->where('status', EnrollmentStatus::Pending);
+    }
+
     /**
      * @return HasMany<Post, $this>
      */
@@ -93,6 +100,19 @@ class Classroom extends Model
     public function isActive(): bool
     {
         return $this->status === ClassroomStatus::Active;
+    }
+
+    /** @return array{palette: string, label: string, base: string, accent: string, pattern: string, sprite: string} */
+    public function theme(): array
+    {
+        $presets = array_keys(ClassroomTheme::PRESETS);
+
+        return ClassroomTheme::resolve(
+            $this->theme_palette ?? $presets[($this->id ?? 0) % count($presets)],
+            $this->theme_pattern,
+            $this->theme_base,
+            $this->theme_accent,
+        );
     }
 
     /**

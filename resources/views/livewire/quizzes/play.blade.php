@@ -1,7 +1,7 @@
-<div class="grid max-w-3xl gap-5">
+<x-classroom-theme :theme="$quiz->classroom->theme()" class="classroom-surface grid min-w-0 gap-5">
     <div>
         <x-ui.breadcrumbs :title="$quiz->title" :items="[$quiz->classroom->name => route('classrooms.show', [$quiz->classroom, 'aba' => 'quizzes'])]" />
-        <x-ui.hero :title="$quiz->title" :subtitle="$quiz->description" :pixel="false" />
+        <x-ui.hero :title="$quiz->title" :subtitle="$quiz->description" :pixel="false" :theme="$quiz->classroom->theme()" />
     </div>
 
     @if ($attempt)
@@ -62,4 +62,4 @@
             <div><x-ui.button type="submit">Enviar respostas</x-ui.button></div>
         @endunless
     </form>
-</div>
+</x-classroom-theme>

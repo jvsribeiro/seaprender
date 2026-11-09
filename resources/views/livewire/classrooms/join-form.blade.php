@@ -17,6 +17,6 @@
                 <p id="code-erro" class="mt-1 text-sm font-medium text-erro">{{ $message }}</p>
             @enderror
         </div>
-        <x-ui.button type="submit">Entrar</x-ui.button>
+        <x-ui.button type="submit">Solicitar inscrição</x-ui.button>
     </div>
 </form>

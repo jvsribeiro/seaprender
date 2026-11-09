@@ -9,6 +9,7 @@ use App\Models\Enrollment;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class EnrollStudent
 {
@@ -23,6 +24,11 @@ class EnrollStudent
     public function handle(User $actor, Classroom $classroom, string $name, string $email): bool
     {
         return DB::transaction(function () use ($actor, $classroom, $name, $email) {
+            $classroom = Classroom::query()->lockForUpdate()->findOrFail($classroom->id);
+            if (! $classroom->isActive()) {
+                throw ValidationException::withMessages(['classroom' => 'Reative a turma para matricular alunos.']);
+            }
+
             $student = User::firstOrCreate(
                 ['email' => Str::lower($email)],
                 ['name' => $name, 'password' => Str::password(32)],
@@ -41,10 +47,11 @@ class EnrollStudent
                 return false;
             }
 
+            $wasPending = $enrollment->status === EnrollmentStatus::Pending;
             $enrollment->status = EnrollmentStatus::Active;
             $enrollment->save();
 
-            $this->recordAuditLog->handle($actor, 'enrollment.added', $enrollment);
+            $this->recordAuditLog->handle($actor, $wasPending ? 'enrollment.approved' : 'enrollment.added', $enrollment);
 
             return true;
         });

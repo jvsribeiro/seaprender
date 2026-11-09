@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Classrooms;
 
+use App\Enums\EnrollmentStatus;
 use App\Livewire\Classrooms\Invite;
 use App\Livewire\Classrooms\JoinForm;
 use App\Models\Classroom;
@@ -14,17 +15,23 @@ class JoinByCodeTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_student_joins_with_a_lowercase_code(): void
+    public function test_lowercase_code_creates_one_pending_request_in_a_closed_catalog(): void
     {
+        config(['app.classroom_open_enrollment' => false]);
         $student = User::factory()->create();
         $classroom = Classroom::factory()->create(['enrollment_code' => 'ABCD2345']);
 
-        Livewire::actingAs($student)->test(JoinForm::class)
-            ->set('code', ' abcd2345 ')
-            ->call('join')
-            ->assertRedirect(route('classrooms.show', $classroom));
+        for ($attempt = 0; $attempt < 2; $attempt++) {
+            Livewire::actingAs($student)->test(JoinForm::class)
+                ->set('code', ' abcd2345 ')
+                ->call('join')
+                ->assertRedirect(route('classrooms.browse'));
+        }
 
-        $this->assertDatabaseHas('enrollments', ['classroom_id' => $classroom->id, 'user_id' => $student->id]);
+        $this->assertDatabaseCount('enrollments', 1);
+        $this->assertDatabaseHas('enrollments', ['classroom_id' => $classroom->id, 'user_id' => $student->id, 'status' => EnrollmentStatus::Pending->value]);
+        $this->get(route('classrooms.browse'))->assertSee($classroom->name)->assertSee('Aguardando aprovação');
+        $this->get(route('classrooms.show', $classroom))->assertNotFound();
     }
 
     public function test_invalid_and_archived_codes_are_refused_the_same_way(): void
@@ -86,7 +93,7 @@ class JoinByCodeTest extends TestCase
         $this->assertDatabaseCount('enrollments', 0);
     }
 
-    public function test_invite_link_shows_the_classroom_and_enrolls(): void
+    public function test_invite_link_shows_the_classroom_and_requests_approval(): void
     {
         $student = User::factory()->create();
         $classroom = Classroom::factory()->create(['name' => 'Turma convidada', 'enrollment_code' => 'ABCD2345']);
@@ -94,7 +101,10 @@ class JoinByCodeTest extends TestCase
         Livewire::actingAs($student)->test(Invite::class, ['code' => 'abcd2345'])
             ->assertSee('Turma convidada')
             ->call('join')
-            ->assertRedirect(route('classrooms.show', $classroom));
+            ->assertRedirect(route('classrooms.browse'));
+
+        $this->assertSame(EnrollmentStatus::Pending, $classroom->enrollments()->sole()->status);
+        $this->get(route('invite', 'ABCD2345'))->assertSee('Aguardando aprovação')->assertDontSee('Abrir turma');
     }
 
     public function test_invalid_invite_says_so(): void

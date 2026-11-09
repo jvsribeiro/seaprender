@@ -1,10 +1,14 @@
-@props(['title', 'subtitle' => null, 'pixel' => true])
+@props(['title', 'subtitle' => null, 'pixel' => true, 'theme' => null])
 
-<section class="hero">
-    <x-pixel name="cloud" class="cloud absolute right-[7%] top-5 hidden w-24 opacity-80 sm:block" />
-    <x-pixel name="cloud" class="cloud absolute right-[30%] top-12 hidden w-14 opacity-50 md:block" />
+<section @class(['hero', 'classroom-theme-hero' => $theme])>
+    @if ($theme)
+        <x-pixel :name="$theme['sprite']" :palette="['w' => $theme['accent']]" class="absolute right-7 top-1/2 hidden w-20 -translate-y-1/2 opacity-85 sm:block" />
+    @else
+        <x-pixel name="cloud" class="cloud absolute right-[7%] top-5 hidden w-24 opacity-80 sm:block" />
+        <x-pixel name="cloud" class="cloud absolute right-[30%] top-12 hidden w-14 opacity-50 md:block" />
+    @endif
 
-    <div class="relative z-10 max-w-2xl">
+    <div @class(['relative z-10 max-w-2xl', 'sm:pr-24' => $theme])>
         <h1 @class([
             'break-words',
             'font-pixel text-4xl font-bold leading-none sm:text-5xl' => $pixel,
@@ -18,5 +22,7 @@
         @endif
     </div>
 
-    <x-scene compact />
+    @unless ($theme)
+        <x-scene compact />
+    @endunless
 </section>
