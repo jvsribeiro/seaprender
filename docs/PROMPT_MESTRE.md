@@ -36,10 +36,10 @@ Versões validadas com `composer require --dry-run` em 07/11/2026:
 | Interação rápida | JavaScript/TypeScript e Canvas, somente nos minijogos |
 | Tempo real | Laravel Reverb ^1.12 + Echo, com polling de 2–3 s como fallback declarado |
 | Autenticação | Laravel Fortify ^1.41, com telas próprias em Blade |
-| Banco | PostgreSQL via Docker Compose. MariaDB 11.8 como alternativa. SQLite só até a Fase 1 |
+| Banco | MySQL 8.4 via Docker Compose. PostgreSQL 17 e MariaDB como alternativas. SQLite só até a Fase 1 |
 | Cache e filas | Redis em produção; driver `database` em desenvolvimento |
 | QR Code | `bacon/bacon-qr-code`, gerado localmente |
-| Testes | PHPUnit 12; testes de concorrência sempre em PostgreSQL ou MariaDB, nunca em SQLite |
+| Testes | PHPUnit 12; testes de concorrência sempre em MySQL, PostgreSQL ou MariaDB, nunca em SQLite |
 
 Sem React ou Vue. Evitar dependências desnecessárias. Docker Compose opcional para app, banco e Redis, com instalação convencional documentada. Decisões técnicas registradas em `docs/ARQUITETURA.md`.
 

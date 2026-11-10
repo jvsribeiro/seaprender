@@ -1,14 +1,18 @@
 # Se Aprender
 
-Plataforma de ensino gamificada para turmas de tecnologia. Laravel 13, Livewire 4, Tailwind 4, PostgreSQL e Vite.
+Plataforma de ensino gamificada para turmas de tecnologia. Laravel 13, Livewire 4, Tailwind 4, MySQL e Vite.
+
+Requer PHP 8.3 ou mais novo e Node 20.19 ou 22.12+. O `composer.json` fixa a plataforma em PHP 8.3, então o `composer.lock` sempre instala em servidores 8.3. O banco padrão é MySQL 8.4, e a suíte também passa em PostgreSQL 17 e SQLite.
 
 ## Rodar o projeto
 
 Com o Docker aberto:
 
 ```bash
-docker compose up -d postgres
+docker compose up -d mysql
 ```
+
+O container cria os bancos `se_aprender` e `se_aprender_test`. Se a porta 3306 já estiver ocupada por outro MySQL, suba com `FORWARD_DB_PORT=3307 docker compose up -d mysql` e use `DB_PORT=3307` no `.env`. Também dá para usar um MySQL 8 que já esteja rodando: crie os dois bancos e um usuário com acesso a eles, e ajuste o `DB_*` no `.env`.
 
 ```bash
 composer run dev
@@ -28,7 +32,9 @@ composer run setup
 php artisan db:seed
 ```
 
-Cria administração, dois professores, duas turmas, 15 alunos fictícios e um mural de exemplo com quiz. Pode rodar de novo sem duplicar nada, e não roda em produção.
+Cria administração, dois professores, duas turmas e 15 alunos fictícios. Cinco alunos também estudam na segunda turma, que tem uma solicitação pendente. O mural de exemplo traz quiz já respondido, votação, reflexão, um jogo do Se Pergunta e a lojinha com pontos, brindes e um resgate pendente. Pode rodar de novo sem duplicar nada, e não roda em produção.
+
+Para testar a sala ao vivo, `php artisan db:seed --class=LiveQuizSeeder` abre o Quiz de HTML ao vivo na turma do João. Esse seeder só roda em ambiente local.
 
 | Perfil | E-mail |
 | --- | --- |
@@ -48,7 +54,7 @@ Abra uma turma para acessar as ferramentas abaixo.
 - **Se Pergunta** guarda jogos separados dos quizzes. Monte perguntas, escolha o tema e o tempo da rodada. Use **Publicar e abrir** para colocar o convite no mural. Cada pergunta começa após a contagem de 3 segundos. Na sala, **Tela cheia** prepara a apresentação para o projetor e **Ligar som** ativa a trilha.
 - **Quizzes** permite criar e publicar perguntas de múltipla escolha. Um quiz com perguntas também pode servir de base para uma partida ao vivo.
 - **Lojinha** permite conceder pontos, disponibilizar brindes, controlar estoque e confirmar entregas. Cada aluno tem saldo por turma e pode acompanhar os próprios resgates. Ao cancelar um pedido pendente, o professor devolve o brinde ao estoque e os pontos ao aluno.
-- **Alunos** e **Acessos** cobrem matrículas, senhas temporárias e o relatório de uso.
+- **Alunos** e **Acessos** cobrem matrículas, senhas temporárias e o relatório de uso. O professor gera senha temporária só para quem estuda apenas com ele. Se o aluno também está na turma de outro professor, a senha nova sai pela administração. Contas de professor ou da administração não entram como alunos.
 - **Auditoria** permite ao professor filtrar o histórico da própria turma por categoria. O registro de uma reflexão guarda o evento de envio. O texto fica no mural e no progresso do aluno.
 
 Em **Nova turma** ou **Editar**, a seção **Tema da turma** combina paleta e padrão de fundo. **Montar meu tema** libera as duas cores com prévia do cabeçalho. O tema aparece na turma, nos cartões e nas telas de quiz.
@@ -68,7 +74,7 @@ post_max_size = 16M
 
 ## Conectar uma IA
 
-A tela de quiz já tem o espaço para gerar perguntas. Para ligar, crie uma classe que implemente `AppContractsQuizQuestionGenerator` e troque o vínculo em `AppServiceProvider`. As perguntas chegam no editor para o professor revisar, nada é publicado sozinho.
+A tela de quiz já tem o espaço para gerar perguntas. Para ligar, crie uma classe que implemente `App\Contracts\QuizQuestionGenerator` e troque o vínculo em `App\Providers\AppServiceProvider`. As perguntas chegam no editor para o professor revisar, nada é publicado sozinho.
 
 ## Perfis
 
@@ -84,6 +90,12 @@ Depois disso, a administração também troca perfis em `/admin/usuarios`.
 
 ```bash
 php artisan test
+```
+
+A suíte usa SQLite em memória e não depende do `npm run build`. Para rodar no MySQL, no banco de testes criado pelo `compose.yaml`:
+
+```bash
+DB_CONNECTION=mysql DB_DATABASE=se_aprender_test php artisan test
 ```
 
 ## Documentação

@@ -12,7 +12,7 @@ Navegador (Blade + Livewire + Alpine)      Projetor / Celular
         ├── Policies / Form Requests
         ├── Events → Listeners → Jobs (Redis em produção)
         ▼
-   PostgreSQL          Storage privado (entregas e anexos)
+   MySQL               Storage privado (entregas e anexos)
 ```
 
 Monólito com a estrutura padrão do Laravel: `app/Actions` guarda as regras de negócio, `app/Livewire` as telas (componentes em classe), `app/Policies` as permissões e `app/Models` os dados. As áreas abaixo organizam o produto e viram subpastas dentro dessas pastas, como `app/Actions/Classrooms`.
@@ -61,7 +61,7 @@ Moedas e XP pertencem à matrícula. Avatar e inventário pertencem ao usuário.
 
 ### D3. PIN único só entre salas ativas
 
-Coluna `active_pin` anulável e única, zerada ao encerrar. Funciona igual em PostgreSQL e MariaDB, sem índice parcial.
+Coluna `active_pin` anulável e única, zerada ao encerrar. Funciona igual em MySQL, PostgreSQL e MariaDB, sem índice parcial.
 
 ### D4. Máquina de estados da sala
 
@@ -128,11 +128,11 @@ Disco privado, nome aleatório, download por rota com Policy. Lista de extensõe
 
 ### D13. Banco
 
-PostgreSQL oficial via Docker Compose. SQLite apenas até a Fase 1. Testes de concorrência usam banco real, em suíte separada.
+MySQL 8.4 oficial via Docker Compose. O código também roda em PostgreSQL 17, e a suíte passa nos dois. SQLite apenas até a Fase 1. Testes de concorrência usam banco real, em suíte separada.
 
 ### D14. Hospedagem
 
-Reverb exige processo persistente. Alvo: VPS com Nginx, PHP-FPM, Supervisor (Reverb e filas), Redis, PostgreSQL e TLS. Hospedagem compartilhada não serve.
+Reverb exige processo persistente. Alvo: VPS com Nginx, PHP-FPM, Supervisor (Reverb e filas), Redis, MySQL e TLS. Hospedagem compartilhada não serve.
 
 ### D15. Autenticação
 

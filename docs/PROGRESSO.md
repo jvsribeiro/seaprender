@@ -1,6 +1,6 @@
 # Progresso
 
-Atualizado em 09/11/2026. Ao retomar, continuar pelo primeiro item aberto.
+Atualizado em 10/11/2026. Ao retomar, continuar pelo primeiro item aberto.
 
 ## Fase 0 — Base
 
@@ -97,3 +97,27 @@ Fases seguintes em [ROADMAP.md](ROADMAP.md).
 - [x] Auditoria por turma para o professor com categorias, ícones e detalhes
 - [x] Paletas e padrões de fundo com prévia e personalização por turma
 - [ ] Piloto com rede da escola, modo projetor e teste de carga com 50 jogadores
+
+## Revisão geral
+
+Feita em 10/11/2026, antes da produção.
+
+- [x] Banco padrão trocado para MySQL 8.4 no `.env.example`, no `compose.yaml` e na documentação
+- [x] Migrations consolidadas: as alterações de tabela entraram nas migrations de criação. Banco local antigo precisa de `php artisan migrate:fresh --seed`
+- [x] Plataforma do Composer fixada em PHP 8.3 e Laravel atualizado para 13.42
+- [x] Professor só gera senha temporária para quem estuda apenas com ele. Contas de professor e da administração não entram como alunos
+- [x] Trocar a senha encerra as sessões nos outros aparelhos
+- [x] Remover uma alternativa mantém o gabarito, e o quiz não é publicado duas vezes com clique duplo
+- [x] Turma arquivada não recebe respostas nem alterações de quiz
+- [x] Diálogos de confirmação não fecham mais sozinhos nas telas ao vivo
+- [x] Telas sem rolagem lateral de 320 a 1920px, inclusive com URLs e nomes longos sem espaço
+- [x] Dados de demonstração com lojinha, votação, reflexão, quiz respondido e Se Pergunta
+
+### Evidências
+
+| Verificação | Resultado |
+| --- | --- |
+| `php artisan test` em SQLite, com PHP 8.4 e 8.3 | 156 testes, todos passando |
+| `php artisan test` em MySQL 8.4 e PostgreSQL 17 | 156 testes, todos passando |
+| `docker compose up -d mysql`, migrations e seed | Bancos criados e seed sem duplicar |
+| Navegador, 320 a 1920px | Professor, aluna, administração, telas ao vivo e páginas públicas sem estouro horizontal |

@@ -69,7 +69,7 @@ Instalação limpa, auditoria de acessibilidade e performance, revisão de segur
 | Decisão | Necessária até | Sugestão |
 | --- | --- | --- |
 | Arquivo original da logo (PNG/SVG) | Fase 1 | Salvar em `public/images/` |
-| Banco oficial | Fase 1 | PostgreSQL via Docker |
+| Banco oficial | Fase 1 | MySQL 8.4 via Docker (decidido em 10/11/2026; antes PostgreSQL) |
 | Hospedagem e domínio | Fase 4 | VPS com TLS |
 | WebSocket na rede da escola | Fase 4 | Testar em sala antes do uso |
 | Política LGPD com a coordenação | Antes de dados reais | Definir base legal, retenção e menores |

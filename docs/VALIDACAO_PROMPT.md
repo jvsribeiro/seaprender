@@ -14,7 +14,7 @@ Revisão feita em 07/11/2026, com testes no ambiente real. O prompt revisado est
 | Licença do Customizable Character Pack | CC0 confirmado na página |
 | Licenças do LPC | Não confirmadas: varia por camada e a página não expôs os créditos |
 | PostgreSQL, Redis, ClamAV locais | Não instalados |
-| Docker | Em uso desde a Fase 1, com PostgreSQL e Redis no `compose.yaml` |
+| Docker | Em uso desde a Fase 1. O `compose.yaml` sobe MySQL e Redis (PostgreSQL até 10/11/2026) |
 | MariaDB local | Instalado (11.8.9), não iniciado |
 
 ## Conflitos corrigidos
