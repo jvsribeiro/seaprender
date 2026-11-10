@@ -1,5 +1,5 @@
 <div @if ($phase !== \App\Models\LiveQuiz::FINISHED && $classroom->isActive()) wire:poll.2s.visible @endif>
-    <x-classroom-theme :theme="$theme" class="classroom-surface grid gap-5">
+    <x-classroom-theme :theme="$theme" class="classroom-surface grid grid-cols-1 gap-5">
         <x-ui.breadcrumbs :title="'Quiz ao vivo'" :items="['Turmas' => route('classrooms.index'), $classroom->name => route('classrooms.show', $classroom)]" />
 
         <x-ui.hero :title="$room->title" :subtitle="$classroom->name.' · Quiz ao vivo'" :pixel="false" :theme="$theme">
@@ -31,7 +31,7 @@
                         @if ($canManage)
                             <p>Peça aos alunos para entrarem na partida pelo mural ou compartilhe o endereço abaixo.</p>
                             <label for="live-room-link" class="mt-3 block text-sm font-semibold">Link da partida</label>
-                            <input id="live-room-link" class="field-input mt-1 text-sm" value="{{ route('quizzes.live', $room) }}" readonly x-on:focus="$el.select()">
+                            <input id="live-room-link" class="field-input mt-1" value="{{ route('quizzes.live', $room) }}" readonly x-on:focus="$el.select()">
                             @if ($classroom->isActive())
                                 <x-ui.button class="mt-3" wire:click="advance(0, 'lobby')" wire:loading.attr="disabled" :disabled="$playerCount < 1">Começar partida</x-ui.button>
                                 @if ($playerCount < 1)
@@ -65,15 +65,15 @@
                     <x-ui.button class="mt-4" wire:click="join" wire:loading.attr="disabled">Participar do quiz</x-ui.button>
                 @endif
 
-                <ol class="mt-4 grid gap-3 sm:grid-cols-2">
+                <ol class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                     @foreach ($question['options'] as $choice => $option)
                         <li class="min-w-0" wire:key="round-{{ $room->question_index }}-choice-{{ $choice }}">
                             @if ($phase === \App\Models\LiveQuiz::QUESTION && $isPlayer && $canJoin && $ownAnswer === null)
-                                <button type="button" class="btn-px btn-secondary h-full w-full break-words p-3 text-left" wire:click="answer({{ $room->question_index }}, {{ $choice }})" wire:loading.attr="disabled" wire:target="answer">
+                                <button type="button" class="btn-px btn-secondary h-full w-full wrap-anywhere p-3 text-left" wire:click="answer({{ $room->question_index }}, {{ $choice }})" wire:loading.attr="disabled" wire:target="answer">
                                     <span class="mr-2 font-bold">{{ chr(65 + $choice) }}.</span>{{ $option }}
                                 </button>
                             @else
-                                <div @class(['h-full break-words border-2 p-3', 'border-azul bg-creme' => ($question['correct'] ?? null) === $choice, 'border-noite/15 bg-white' => ($question['correct'] ?? null) !== $choice])>
+                                <div @class(['h-full wrap-anywhere border-2 p-3', 'border-azul bg-creme' => ($question['correct'] ?? null) === $choice, 'border-noite/15 bg-white' => ($question['correct'] ?? null) !== $choice])>
                                     <p><span class="mr-2 font-bold">{{ chr(65 + $choice) }}.</span>{{ $option }}</p>
                                     <div class="mt-1 flex flex-wrap gap-2 text-xs font-semibold">
                                         @if (($question['correct'] ?? null) === $choice)
@@ -93,7 +93,7 @@
                 </ol>
 
                 @if ($phase === \App\Models\LiveQuiz::REVEAL && $question['explanation'])
-                    <p class="mt-4 whitespace-pre-wrap break-words border-l-4 border-azul bg-creme/70 p-3">{{ $question['explanation'] }}</p>
+                    <p class="mt-4 whitespace-pre-wrap wrap-anywhere border-l-4 border-azul bg-creme/70 p-3">{{ $question['explanation'] }}</p>
                 @endif
 
                 @if ($canManage && $classroom->isActive())
@@ -119,7 +119,7 @@
                         @foreach ($rankings as $player)
                             <li class="flex min-w-0 items-center gap-3 border-2 border-noite/10 bg-creme/50 p-3" wire:key="live-rank-{{ $player->id }}">
                                 <span class="grid size-9 shrink-0 place-items-center border-2 border-azul bg-white font-bold text-azul">{{ $player->rank }}º</span>
-                                <span class="min-w-0 flex-1 break-words font-semibold">{{ $player->name }}</span>
+                                <span class="min-w-0 flex-1 wrap-anywhere font-semibold">{{ $player->name }}</span>
                                 <span class="shrink-0 font-bold text-azul">{{ $player->points }} pts</span>
                             </li>
                         @endforeach

@@ -1,4 +1,4 @@
-<div class="grid gap-5">
+<div class="grid grid-cols-1 gap-5">
     @error('title')
         <p class="alert" role="alert">{{ $message }}</p>
     @enderror
@@ -30,7 +30,7 @@
                             <x-ui.badge tone="muted">{{ $quiz->subject->name }}</x-ui.badge>
                         @endif
                     </div>
-                    <h2 class="mt-1 break-words font-marca text-lg font-semibold text-azul">{{ $quiz->title }}</h2>
+                    <h2 class="mt-1 wrap-anywhere font-marca text-lg font-semibold text-azul">{{ $quiz->title }}</h2>
                     <p class="text-sm">
                         {{ $quiz->questions_count }} {{ $quiz->questions_count === 1 ? 'pergunta' : 'perguntas' }}
                         @if ($canManage)
@@ -43,12 +43,12 @@
 
                 <div class="flex flex-wrap items-center gap-3">
                     @if ($canManage)
-                        @unless ($quiz->isPublished())
-                            <x-ui.button wire:click="publish({{ $quiz->id }})">Publicar</x-ui.button>
-                        @else
+                        @if ($quiz->isPublished())
                             <x-ui.button variant="secondary" :href="route('quizzes.results', $quiz)">Resultados</x-ui.button>
-                        @endunless
-                        @if ($quiz->answers_count === 0)
+                        @elseif ($classroom->isActive())
+                            <x-ui.button wire:click="publish({{ $quiz->id }})">Publicar</x-ui.button>
+                        @endif
+                        @if ($classroom->isActive() && $quiz->answers_count === 0)
                             <x-ui.button variant="secondary" :href="route('quizzes.edit', $quiz)">Editar</x-ui.button>
                         @endif
                         <x-ui.confirm title="Excluir este quiz?" label="Excluir" action="remove({{ $quiz->id }})">

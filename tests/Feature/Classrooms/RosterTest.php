@@ -71,6 +71,22 @@ class RosterTest extends TestCase
         $this->assertSame('Nome Original', $student->refresh()->name);
     }
 
+    public function test_staff_accounts_cannot_be_enrolled_as_students(): void
+    {
+        $classroom = Classroom::factory()->create();
+        $otherTeacher = User::factory()->teacher()->create();
+
+        Livewire::actingAs($classroom->teacher)->test(Show::class, ['classroom' => $classroom])
+            ->set('tab', 'alunos')
+            ->set('studentName', $otherTeacher->name)
+            ->set('studentEmail', $otherTeacher->email)
+            ->call('addStudent')
+            ->assertHasErrors(['studentEmail'])
+            ->assertSee('Esse e-mail é de uma conta de professor ou da administração.');
+
+        $this->assertDatabaseCount('enrollments', 0);
+    }
+
     public function test_invalid_email_is_refused(): void
     {
         $classroom = Classroom::factory()->create();

@@ -4,7 +4,7 @@
     <x-classroom-cover :classroom="$classroom" />
     <div class="p-4">
         <div class="flex items-start justify-between gap-3">
-            <h3 class="min-w-0 break-words font-marca text-lg font-semibold text-azul">{{ $classroom->name }}</h3>
+            <h3 class="min-w-0 wrap-anywhere font-marca text-lg font-semibold text-azul">{{ $classroom->name }}</h3>
             <x-ui.badge :tone="$classroom->isActive() ? 'blue' : 'muted'" class="shrink-0">{{ $classroom->status->label() }}</x-ui.badge>
         </div>
         <p class="mt-1 text-sm">{{ $classroom->curricular_unit }} · {{ $classroom->period }}</p>

@@ -1,7 +1,7 @@
 <div>
     <x-ui.page-header title="Auditoria" subtitle="Quem entrou, o que abriu e o que mudou." />
 
-    <div class="mb-5 grid max-w-2xl gap-3 sm:grid-cols-2">
+    <div class="mb-5 grid grid-cols-1 max-w-2xl gap-3 sm:grid-cols-2">
         <div>
             <label for="pessoa" class="mb-1 block text-sm font-semibold">Pessoa</label>
             <input id="pessoa" type="search" class="field-input" wire:model.live.debounce.300ms="person">

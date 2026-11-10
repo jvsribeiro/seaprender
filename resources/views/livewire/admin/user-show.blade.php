@@ -5,7 +5,7 @@
         <p class="alert mb-5" role="alert">{{ $message }}</p>
     @enderror
 
-    <div class="mb-6 grid gap-4 sm:grid-cols-3">
+    <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div class="card py-4">
             <p class="font-marca text-xl font-semibold text-azul">{{ $user->last_seen_at?->diffForHumans() ?? 'Nunca acessou' }}</p>
             <p class="mt-1 text-sm font-medium">Último acesso</p>
@@ -14,7 +14,7 @@
         <x-ui.stat label="Quizzes respondidos" :value="$answeredQuizzesCount" sprite="trophy" />
     </div>
 
-    <div class="grid gap-5 lg:grid-cols-[1fr_20rem]">
+    <div class="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_20rem]">
         <x-ui.card title="O que esta pessoa fez">
             @if ($logs->isEmpty())
                 <x-ui.empty title="Nenhum registro ainda" />
@@ -39,12 +39,14 @@
         <div class="grid content-start gap-5">
             <x-ui.card title="Ações">
                 <div class="mt-3 grid justify-items-start gap-3">
-                    <x-ui.confirm title="Gerar senha temporária?" label="Gerar senha" action="issueTemporaryPassword">
-                        <x-slot:trigger>
-                            <x-ui.button variant="secondary">Gerar senha temporária</x-ui.button>
-                        </x-slot:trigger>
-                        A senha atual para de funcionar e a pessoa sai de todos os aparelhos.
-                    </x-ui.confirm>
+                    @unless ($user->is(auth()->user()))
+                        <x-ui.confirm title="Gerar senha temporária?" label="Gerar senha" action="issueTemporaryPassword">
+                            <x-slot:trigger>
+                                <x-ui.button variant="secondary">Gerar senha temporária</x-ui.button>
+                            </x-slot:trigger>
+                            A senha atual para de funcionar e a pessoa sai de todos os aparelhos.
+                        </x-ui.confirm>
+                    @endunless
                     <x-ui.button variant="secondary" wire:click="sendResetLink">Enviar link por e-mail</x-ui.button>
                     @unless ($user->is(auth()->user()))
                         <x-ui.confirm title="Excluir esta conta?" label="Excluir conta" action="deleteUser">

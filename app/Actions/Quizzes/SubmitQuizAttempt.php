@@ -22,6 +22,10 @@ class SubmitQuizAttempt
      */
     public function handle(User $student, Quiz $quiz, array $answers): QuizAttempt
     {
+        if (! $quiz->classroom->isActive()) {
+            throw ValidationException::withMessages(['answers' => 'A turma está arquivada e não recebe mais respostas.']);
+        }
+
         $questions = $quiz->questions()->get();
 
         $unanswered = $questions->reject(fn (QuizQuestion $question) => $this->isValidAnswer($question, $answers[$question->id] ?? null));

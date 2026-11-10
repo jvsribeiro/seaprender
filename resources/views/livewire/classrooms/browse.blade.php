@@ -1,4 +1,4 @@
-<div class="grid gap-6">
+<div class="grid grid-cols-1 gap-6">
     <x-ui.hero title="Procurar turmas" :subtitle="$openEnrollment ? 'Encontre a turma e envie um pedido de inscrição ao professor.' : 'Use o código do professor para solicitar inscrição na sua turma.'">
         <div class="max-w-sm">
             <label for="busca" class="mb-1 block text-sm font-semibold">Turma, curso ou professor</label>
@@ -22,13 +22,13 @@
         </div>
     @else
         <div>
-            <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach ($classrooms as $classroom)
                     <article class="card flex flex-col p-0" wire:key="classroom-{{ $classroom->id }}">
                         <x-classroom-cover :classroom="$classroom" />
                         <div class="flex flex-1 flex-col gap-3 p-4">
                             <div class="min-w-0">
-                                <h2 class="break-words font-marca text-lg font-semibold text-azul">{{ $classroom->name }}</h2>
+                                <h2 class="wrap-anywhere font-marca text-lg font-semibold text-azul">{{ $classroom->name }}</h2>
                                 <p class="mt-1 text-sm">{{ $classroom->course }} · {{ $classroom->curricular_unit }}</p>
                                 <p class="mt-1 text-sm">{{ $classroom->period }} · {{ $classroom->teacher->name }}</p>
                                 <p class="mt-1 text-sm font-medium">{{ $classroom->active_enrollments_count }} {{ $classroom->active_enrollments_count === 1 ? 'aluno' : 'alunos' }}</p>

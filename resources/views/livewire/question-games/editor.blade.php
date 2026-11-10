@@ -4,8 +4,8 @@
         :breadcrumbs="[$classroom->name => route('classrooms.show', ['classroom' => $classroom, 'aba' => 'se-pergunta'])]"
     />
 
-    <form wire:submit="save" class="grid w-full min-w-0 gap-5">
-        <x-ui.card title="Conteúdo do jogo" class="grid gap-4 sm:grid-cols-2">
+    <form wire:submit="save" class="grid w-full min-w-0 max-w-4xl gap-5">
+        <x-ui.card title="Conteúdo do jogo" class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div class="sm:col-span-2"><x-ui.input name="title" label="Nome do jogo" placeholder="Missão de revisão" maxlength="160" required /></div>
             <x-ui.input name="topic" label="Tema do conteúdo" placeholder="Frações, história, meio ambiente…" maxlength="100" />
             <x-ui.input name="seconds" label="Segundos por pergunta" type="number" min="10" max="120" required />
@@ -17,7 +17,7 @@
         </x-ui.card>
 
         <x-ui.card title="Aparência do jogo">
-            <div class="mt-3 grid gap-3 sm:grid-cols-2">
+            <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div>
                     <label for="palette" class="mb-1 block text-sm font-semibold">Paleta</label>
                     <select id="palette" class="field-input" wire:model.live="palette">
@@ -40,7 +40,7 @@
             </div>
 
             @if ($palette === 'custom')
-                <div class="mt-3 grid gap-3 sm:grid-cols-2">
+                <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                     @foreach (['base' => ['Cor principal', $preview['base']], 'accent' => ['Cor de destaque', $preview['accent']]] as $field => [$label, $color])
                         <div wire:key="game-color-{{ $field }}">
                             <label for="game-{{ $field }}" class="mb-1 block text-sm font-semibold">{{ $label }}</label>
@@ -57,7 +57,7 @@
                         <x-se-perguntar-logo class="w-36 max-w-full" />
                         <p class="game-kicker">Prévia do jogo</p>
                     </div>
-                    <p class="mt-1 break-words font-marca text-2xl font-bold">{{ $title ?: 'Seu jogo' }}</p>
+                    <p class="mt-1 wrap-anywhere font-marca text-2xl font-bold">{{ $title ?: 'Seu jogo' }}</p>
                     <div class="mt-4 grid grid-cols-2 gap-2">
                         <span class="game-option" data-option="0"><span class="game-symbol" aria-hidden="true">▲</span> Alternativa A</span>
                         <span class="game-option" data-option="1"><span class="game-symbol" aria-hidden="true">◆</span> Alternativa B</span>

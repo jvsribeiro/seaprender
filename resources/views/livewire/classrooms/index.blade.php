@@ -24,7 +24,7 @@
             <x-ui.empty :title="$search === '' ? 'Nenhuma turma por aqui' : 'Nada encontrado'" />
         </div>
     @else
-        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             @foreach ($classrooms as $classroom)
                 <x-classroom-card :classroom="$classroom" wire:key="classroom-{{ $classroom->id }}" />
             @endforeach

@@ -20,6 +20,8 @@ class EnrollStudent
      * student has to prove ownership of the address through the password reset.
      *
      * @return bool Whether the student became active in the classroom.
+     *
+     * @throws ValidationException
      */
     public function handle(User $actor, Classroom $classroom, string $name, string $email): bool
     {
@@ -33,6 +35,10 @@ class EnrollStudent
                 ['email' => Str::lower($email)],
                 ['name' => $name, 'password' => Str::password(32)],
             );
+
+            if (! $student->isStudent()) {
+                throw ValidationException::withMessages(['studentEmail' => 'Esse e-mail é de uma conta de professor ou da administração.']);
+            }
 
             if ($student->id === $classroom->teacher_id) {
                 return false;

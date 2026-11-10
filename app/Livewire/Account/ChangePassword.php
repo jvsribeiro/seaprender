@@ -6,6 +6,8 @@ use App\Actions\RecordAuditLog;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -30,7 +32,10 @@ class ChangePassword extends Component
 
         $user->password = $this->password;
         $user->must_change_password = false;
+        $user->setRememberToken(Str::random(60));
         $user->save();
+
+        DB::table('sessions')->where('user_id', $user->id)->where('id', '!=', session()->getId())->delete();
 
         $recordAuditLog->handle($user, 'user.password_changed');
 

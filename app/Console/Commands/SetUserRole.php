@@ -6,6 +6,7 @@ use App\Actions\Users\ChangeUserRole;
 use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 
 class SetUserRole extends Command
 {
@@ -28,7 +29,7 @@ class SetUserRole extends Command
      */
     public function handle(ChangeUserRole $changeUserRole): int
     {
-        $user = User::where('email', $this->argument('email'))->first();
+        $user = User::where('email', Str::lower(trim($this->argument('email'))))->first();
         $role = UserRole::tryFrom($this->argument('role'));
 
         if (! $user || ! $role) {

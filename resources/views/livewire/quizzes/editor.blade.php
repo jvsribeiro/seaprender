@@ -4,8 +4,8 @@
         :breadcrumbs="[$classroom->name => route('classrooms.show', [$classroom, 'aba' => 'quizzes'])]"
     />
 
-    <form wire:submit="saveDraft" class="grid w-full min-w-0 gap-5">
-        <div class="card grid gap-4 sm:grid-cols-2">
+    <form wire:submit="saveDraft" class="grid w-full min-w-0 max-w-4xl gap-5">
+        <div class="card grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div class="sm:col-span-2"><x-ui.input name="title" label="Título" maxlength="160" /></div>
             <div class="sm:col-span-2">
                 <label for="description" class="mb-1 block text-sm font-semibold">Descrição</label>
@@ -37,8 +37,8 @@
         @include('livewire.quizzes.question-fields')
 
         <div class="flex flex-wrap gap-3">
-            <x-ui.button wire:click="saveAndPublish">Publicar no mural</x-ui.button>
-            <x-ui.button type="submit" variant="secondary">Salvar rascunho</x-ui.button>
+            <x-ui.button wire:click="saveAndPublish" wire:loading.attr="disabled" wire:target="saveAndPublish,saveDraft">Publicar no mural</x-ui.button>
+            <x-ui.button type="submit" variant="secondary" wire:loading.attr="disabled" wire:target="saveAndPublish,saveDraft">Salvar rascunho</x-ui.button>
         </div>
     </form>
 </x-classroom-theme>

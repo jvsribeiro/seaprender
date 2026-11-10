@@ -1,4 +1,4 @@
-<div class="grid gap-6">
+<div class="grid grid-cols-1 gap-6">
     <x-ui.hero
         :title="'Olá, '.str($user->name)->before(' ').'!'"
         :subtitle="match (true) {
@@ -16,7 +16,7 @@
     </x-ui.hero>
 
     @if ($user->isAdmin() || $user->isTeacher())
-        <div class="grid gap-4 sm:grid-cols-3">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <x-ui.stat label="Turmas ativas" :value="$activeClassroomsCount" sprite="chest" />
             <x-ui.stat label="Alunos matriculados" :value="$studentsCount" sprite="star" />
             @if ($user->isAdmin())
@@ -61,7 +61,7 @@
                 </x-ui.empty>
             </div>
         @else
-            <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach ($classrooms as $classroom)
                     <x-classroom-card :classroom="$classroom" wire:key="classroom-{{ $classroom->id }}" />
                 @endforeach

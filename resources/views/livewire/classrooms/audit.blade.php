@@ -27,16 +27,16 @@
                         <x-ui.badge tone="muted">{{ $label }}</x-ui.badge>
                         <time class="text-xs font-semibold text-noite/75" datetime="{{ $log->created_at->toIso8601String() }}">{{ $log->created_at->format('d/m/Y · H:i') }}</time>
                     </div>
-                    <p class="mt-1 break-words font-marca text-lg font-semibold text-azul">{{ $labels[$log->action] ?? 'Evento registrado' }}</p>
+                    <p class="mt-1 wrap-anywhere font-marca text-lg font-semibold text-azul">{{ $labels[$log->action] ?? 'Evento registrado' }}</p>
                     <p class="text-sm"><span class="font-semibold">Por</span> {{ $log->actor?->name ?? 'Sistema ou conta excluída' }}</p>
                     @if (isset($details['title']))
-                        <p class="mt-1 break-words text-sm">{{ $details['title'] }}</p>
+                        <p class="mt-1 wrap-anywhere text-sm">{{ $details['title'] }}</p>
                     @endif
                     @if (isset($details['student']))
-                        <p class="break-words text-sm"><span class="font-semibold">Aluno</span> {{ $details['student'] }}</p>
+                        <p class="wrap-anywhere text-sm"><span class="font-semibold">Aluno</span> {{ $details['student'] }}</p>
                     @endif
                     @if (isset($details['reason']))
-                        <p class="break-words text-sm"><span class="font-semibold">Motivo</span> {{ $details['reason'] }}</p>
+                        <p class="wrap-anywhere text-sm"><span class="font-semibold">Motivo</span> {{ $details['reason'] }}</p>
                     @endif
                     @if (isset($details['points']))
                         <p class="text-sm font-semibold">{{ $details['points'] }} pontos</p>

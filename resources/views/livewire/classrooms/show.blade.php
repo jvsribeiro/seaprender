@@ -32,7 +32,7 @@
         $tabIcons = ['mural' => 'book', 'progresso' => 'trophy', 'quizzes' => 'check', 'se-pergunta' => 'star', 'loja' => 'coin', 'ferramentas' => 'chest', 'alunos' => 'users', 'acessos' => 'eye', 'auditoria' => 'clipboard'];
         $showSidebar = in_array($activeTab, ['mural', 'quizzes', 'alunos'], true);
     @endphp
-    <nav class="tabs mt-6 flex-wrap" aria-label="Seções da turma">
+    <nav class="tabs mt-6 lg:flex-wrap" aria-label="Seções da turma" x-data x-init="let tab = $el.querySelector('[aria-current]'); if (tab) $el.scrollLeft += tab.getBoundingClientRect().left - $el.getBoundingClientRect().left - 16">
         @foreach ($tabs as $key => $label)
             <button type="button" class="tab inline-flex items-center gap-2 px-3" wire:click="$set('tab', '{{ $key }}')" wire:key="tab-{{ $key }}" @if ($activeTab === $key) aria-current="page" @endif>
                 <x-pixel :name="$tabIcons[$key]" :palette="['w' => 'currentColor']" class="size-5 shrink-0" />
@@ -44,7 +44,7 @@
         @endforeach
     </nav>
 
-    <div @class(['mt-5 grid gap-5', 'xl:grid-cols-[minmax(0,1fr)_20rem]' => $showSidebar])>
+    <div @class(['mt-5 grid grid-cols-1 gap-5', 'xl:grid-cols-[minmax(0,1fr)_20rem]' => $showSidebar])>
         <div class="grid min-w-0 grid-cols-1 content-start gap-5">
             @if ($activeTab === 'mural')
                 @if ($canManage && $classroom->isActive())
@@ -85,7 +85,7 @@
                             @foreach ($requests as $request)
                                 <li class="flex flex-wrap items-center justify-between gap-3 py-3" wire:key="pending-enrollment-{{ $request->id }}">
                                     <div class="min-w-0 flex-1 basis-40">
-                                        <p class="break-words font-semibold">{{ $request->user->name }}</p>
+                                        <p class="wrap-anywhere font-semibold">{{ $request->user->name }}</p>
                                         <p class="break-all text-sm text-noite/75">{{ $request->user->email }}</p>
                                     </div>
                                     @if ($classroom->isActive())
@@ -118,12 +118,16 @@
                                         </div>
                                     </div>
                                     <div class="flex shrink-0 items-center gap-4">
-                                        <x-ui.confirm title="Gerar senha temporária?" label="Gerar senha" action="resetStudentPassword({{ $enrollment->id }})">
-                                            <x-slot:trigger>
-                                                <button type="button" class="btn-quiet text-sm">Nova senha<span class="sr-only"> para {{ $enrollment->user->name }}</span></button>
-                                            </x-slot:trigger>
-                                            A senha atual de {{ $enrollment->user->name }} para de funcionar.
-                                        </x-ui.confirm>
+                                        @if ($enrollment->user->studies_with_other_teachers && ! auth()->user()->isAdmin())
+                                            <span class="text-sm text-noite/70">Senha pela administração<span class="sr-only">: {{ $enrollment->user->name }} também estuda com outros professores</span></span>
+                                        @else
+                                            <x-ui.confirm title="Gerar senha temporária?" label="Gerar senha" action="resetStudentPassword({{ $enrollment->id }})">
+                                                <x-slot:trigger>
+                                                    <button type="button" class="btn-quiet text-sm">Nova senha<span class="sr-only"> para {{ $enrollment->user->name }}</span></button>
+                                                </x-slot:trigger>
+                                                A senha atual de {{ $enrollment->user->name }} para de funcionar.
+                                            </x-ui.confirm>
+                                        @endif
                                         <x-ui.confirm title="Remover da turma?" label="Remover" action="removeStudent({{ $enrollment->id }})">
                                             <x-slot:trigger>
                                                 <button type="button" class="btn-quiet text-sm text-erro">Remover<span class="sr-only"> {{ $enrollment->user->name }}</span></button>
@@ -140,7 +144,7 @@
 
                 @if ($classroom->isActive())
                     <x-ui.card title="Adicionar aluno">
-                        <form wire:submit="addStudent" class="mt-3 grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-start">
+                        <form wire:submit="addStudent" class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-start">
                             <x-ui.input name="studentName" label="Nome" autocomplete="off" />
                             <x-ui.input name="studentEmail" label="E-mail" type="email" autocomplete="off" />
                             <x-ui.button type="submit" class="sm:mt-6">Adicionar</x-ui.button>
@@ -199,7 +203,7 @@
                     >
                         <p class="ticket mt-3">{{ $classroom->enrollment_code }}</p>
                         <label for="link-convite" class="mt-3 block text-sm font-semibold">Link de convite</label>
-                        <input id="link-convite" x-ref="link" type="text" readonly class="field-input text-sm" value="{{ route('invite', $classroom->enrollment_code) }}">
+                        <input id="link-convite" x-ref="link" type="text" readonly class="field-input" value="{{ route('invite', $classroom->enrollment_code) }}">
                         <div class="mt-3 flex flex-wrap items-center gap-3">
                             <x-ui.button x-on:click="copy" x-text="copied ? 'Copiado!' : 'Copiar link'">Copiar link</x-ui.button>
                             <x-ui.confirm title="Gerar um novo código?" label="Trocar código" action="regenerateCode">

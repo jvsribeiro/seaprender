@@ -1,10 +1,10 @@
-<div class="grid gap-5">
+<div class="grid grid-cols-1 gap-5">
     @error('shop')
         <p class="alert" role="alert">{{ $message }}</p>
     @enderror
 
     @if ($canManage && $classroom->isActive())
-        <div class="grid gap-4 lg:grid-cols-2">
+        <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
             <x-ui.card title="Conceder pontos">
                 <p class="mt-1 text-sm">Reconheça uma participação ou atividade com pontos e um motivo.</p>
                 @if ($students->isEmpty())
@@ -58,7 +58,7 @@
         @if ($catalog->isEmpty())
             <x-ui.empty title="A lojinha ainda está vazia" sprite="chest">Os brindes aparecem aqui assim que forem liberados.</x-ui.empty>
         @else
-            <div class="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 @foreach ($catalog as $reward)
                     <article class="grid min-w-0 content-start gap-2 border-2 border-noite/10 bg-creme/50 p-3" wire:key="reward-{{ $reward->id }}">
                         <div class="flex items-start justify-between gap-2">
@@ -67,9 +67,9 @@
                                 {{ ! $reward->enabled ? 'Pausado' : ($reward->stock > 0 ? $reward->stock.' em estoque' : 'Esgotado') }}
                             </x-ui.badge>
                         </div>
-                        <h3 class="break-words font-marca text-lg font-semibold text-azul">{{ $reward->title }}</h3>
+                        <h3 class="wrap-anywhere font-marca text-lg font-semibold text-azul">{{ $reward->title }}</h3>
                         @if ($reward->description)
-                            <p class="break-words text-sm">{{ $reward->description }}</p>
+                            <p class="wrap-anywhere text-sm">{{ $reward->description }}</p>
                         @endif
                         <p class="font-bold text-azul">{{ $reward->cost }} pontos</p>
                         @if ($classroom->isActive())
@@ -100,7 +100,7 @@
             @forelse ($redemptions as $redemption)
                 <li class="flex flex-wrap items-center justify-between gap-3 py-3" wire:key="redemption-{{ $redemption->id }}">
                     <div class="min-w-0">
-                        <p class="break-words font-semibold text-azul">{{ $redemption->title }}</p>
+                        <p class="wrap-anywhere font-semibold text-azul">{{ $redemption->title }}</p>
                         <p class="text-sm">{{ $redemption->cost }} pontos @if ($canManage) · {{ $redemption->name ?? 'Conta excluída' }} @endif</p>
                     </div>
                     <x-ui.badge :tone="$redemption->status === 'pending' ? 'blue' : 'muted'">
@@ -128,7 +128,7 @@
             <ul class="mt-2 divide-y divide-noite/10">
                 @forelse ($entries as $entry)
                     <li class="flex items-center justify-between gap-3 py-2 text-sm" wire:key="point-entry-{{ $entry->id }}">
-                        <span class="min-w-0 break-words">{{ $entry->reason }}</span>
+                        <span class="min-w-0 wrap-anywhere">{{ $entry->reason }}</span>
                         <span class="shrink-0 font-bold text-azul">{{ $entry->amount > 0 ? '+' : '' }}{{ $entry->amount }} pts</span>
                     </li>
                 @empty

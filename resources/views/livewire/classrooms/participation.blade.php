@@ -1,4 +1,4 @@
-<section class="mt-4 grid gap-3 border-2 border-noite/10 bg-creme/50 p-3 sm:p-4" @if ($isPoll && $post->closed_at === null && $post->classroom->isActive()) wire:poll.5s.visible @endif>
+<section class="mt-4 grid grid-cols-1 gap-3 border-2 border-noite/10 bg-creme/50 p-3 sm:p-4" @if ($isPoll && $post->closed_at === null && $post->classroom->isActive()) wire:poll.5s.visible @endif>
     @error('response')
         <p class="alert" role="alert">{{ $message }}</p>
     @enderror
@@ -32,12 +32,12 @@
             @foreach ($post->poll_options as $choice => $option)
                 <li class="min-w-0" wire:key="option-{{ $post->id }}-{{ $choice }}">
                     @if ($canRespond && ! $own)
-                        <button type="button" class="btn-px btn-secondary w-full break-words text-left" wire:click="vote({{ $choice }})" wire:loading.attr="disabled" wire:target="vote">
+                        <button type="button" class="btn-px btn-secondary w-full wrap-anywhere text-left" wire:click="vote({{ $choice }})" wire:loading.attr="disabled" wire:target="vote">
                             {{ $option }}
                         </button>
                     @else
                         <div class="flex flex-wrap justify-between gap-2 text-sm">
-                            <span class="break-words font-semibold">{{ $option }} @if ($own?->choice === $choice) <span class="text-azul">(seu voto)</span> @endif</span>
+                            <span class="wrap-anywhere font-semibold">{{ $option }} @if ($own?->choice === $choice) <span class="text-azul">(seu voto)</span> @endif</span>
                             @if ($showResults)
                                 <span>{{ $totals->get($choice, 0) }}</span>
                             @endif
@@ -61,9 +61,9 @@
                 <article class="min-w-0 border-t-2 border-noite/10 pt-3 text-sm" wire:key="reflection-{{ $post->id }}-{{ $reflection->user_id }}">
                     <h3 class="font-bold text-azul">{{ $reflection->name }}</h3>
                     <dl class="mt-2 grid gap-2">
-                        <div><dt class="font-semibold">Gostou de</dt><dd class="whitespace-pre-wrap break-words">{{ $reflection->liked }}</dd></div>
-                        <div><dt class="font-semibold">Sugere melhorar</dt><dd class="whitespace-pre-wrap break-words">{{ $reflection->improve }}</dd></div>
-                        <div><dt class="font-semibold">Resumo</dt><dd class="whitespace-pre-wrap break-words">{{ $reflection->summary }}</dd></div>
+                        <div><dt class="font-semibold">Gostou de</dt><dd class="whitespace-pre-wrap wrap-anywhere">{{ $reflection->liked }}</dd></div>
+                        <div><dt class="font-semibold">Sugere melhorar</dt><dd class="whitespace-pre-wrap wrap-anywhere">{{ $reflection->improve }}</dd></div>
+                        <div><dt class="font-semibold">Resumo</dt><dd class="whitespace-pre-wrap wrap-anywhere">{{ $reflection->summary }}</dd></div>
                     </dl>
                 </article>
             @endforeach
@@ -90,9 +90,9 @@
         <div class="text-sm">
             <p class="font-bold text-azul">Sua reflexão</p>
             <dl class="mt-2 grid gap-2">
-                <div><dt class="font-semibold">O que você gostou</dt><dd class="whitespace-pre-wrap break-words">{{ $own->liked }}</dd></div>
-                <div><dt class="font-semibold">O que pode melhorar</dt><dd class="whitespace-pre-wrap break-words">{{ $own->improve }}</dd></div>
-                <div><dt class="font-semibold">Seu resumo</dt><dd class="whitespace-pre-wrap break-words">{{ $own->summary }}</dd></div>
+                <div><dt class="font-semibold">O que você gostou</dt><dd class="whitespace-pre-wrap wrap-anywhere">{{ $own->liked }}</dd></div>
+                <div><dt class="font-semibold">O que pode melhorar</dt><dd class="whitespace-pre-wrap wrap-anywhere">{{ $own->improve }}</dd></div>
+                <div><dt class="font-semibold">Seu resumo</dt><dd class="whitespace-pre-wrap wrap-anywhere">{{ $own->summary }}</dd></div>
             </dl>
         </div>
     @endif

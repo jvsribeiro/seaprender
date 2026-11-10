@@ -35,7 +35,7 @@
                             <label for="perfil-{{ $user->id }}" class="sr-only">Perfil de {{ $user->name }}</label>
                             <select
                                 id="perfil-{{ $user->id }}"
-                                class="field-input py-1.5 text-sm"
+                                class="field-input py-1.5"
                                 wire:change="changeRole({{ $user->id }}, $event.target.value)"
                                 @disabled($user->is(auth()->user()))
                             >

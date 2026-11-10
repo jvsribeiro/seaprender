@@ -29,6 +29,10 @@ class PublishQuiz
             return;
         }
 
+        if (! $quiz->classroom->isActive()) {
+            throw ValidationException::withMessages(['title' => 'Reative a turma para publicar.']);
+        }
+
         if (! $quiz->questions()->exists()) {
             throw ValidationException::withMessages(['title' => 'Adicione pelo menos uma pergunta antes de publicar.']);
         }

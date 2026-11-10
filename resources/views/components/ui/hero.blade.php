@@ -10,7 +10,7 @@
 
     <div @class(['relative z-10 max-w-2xl', 'sm:pr-24' => $theme])>
         <h1 @class([
-            'break-words',
+            'wrap-anywhere',
             'font-pixel text-4xl font-bold leading-none sm:text-5xl' => $pixel,
             'font-marca text-3xl font-semibold sm:text-4xl' => ! $pixel,
         ])>{{ $title }}</h1>

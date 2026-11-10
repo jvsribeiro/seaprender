@@ -1,4 +1,4 @@
-<div class="grid gap-5">
+<div class="grid grid-cols-1 gap-5">
     @error('room') <p class="alert" role="alert">{{ $message }}</p> @enderror
 
     <x-classroom-theme :theme="\App\Support\ClassroomTheme::resolve('orbit')" class="se-pergunta-stage">
@@ -17,7 +17,7 @@
     @if ($canManage)
         @if ($activeRoom)
             <x-ui.card class="flex flex-wrap items-center justify-between gap-3">
-                <p class="break-words text-sm font-semibold">Partida aberta · {{ $activeRoom->title }}</p>
+                <p class="wrap-anywhere text-sm font-semibold">Partida aberta · {{ $activeRoom->title }}</p>
                 <x-ui.button :href="route('quizzes.live', $activeRoom)">Voltar à partida</x-ui.button>
             </x-ui.card>
         @endif
@@ -27,7 +27,7 @@
                 <x-ui.empty title="Crie seu primeiro jogo" sprite="star">Escolha um assunto, escreva as perguntas e monte o visual da partida.</x-ui.empty>
             </x-ui.card>
         @else
-            <div class="grid gap-4 sm:grid-cols-2">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 @foreach ($games as $game)
                     <article class="card min-w-0 overflow-hidden p-0" wire:key="question-game-{{ $game->id }}">
                         <x-classroom-theme :theme="$game->theme" class="classroom-cover flex h-14 items-center justify-end px-4">
@@ -35,7 +35,7 @@
                         </x-classroom-theme>
                         <div class="p-4">
                             <p class="text-xs font-semibold uppercase tracking-wide text-azul">{{ $game->topic ?: 'Se Pergunta' }}</p>
-                            <h3 class="mt-1 break-words font-marca text-lg font-bold text-noite">{{ $game->title }}</h3>
+                            <h3 class="mt-1 wrap-anywhere font-marca text-lg font-bold text-noite">{{ $game->title }}</h3>
                             <p class="mt-1 text-sm">{{ count($game->questions) }} perguntas · {{ $game->seconds_per_question }} s por pergunta</p>
                             @if ($classroom->isActive())
                                 <div class="mt-4 flex flex-wrap gap-2">
@@ -57,7 +57,7 @@
             <ul class="mt-2 divide-y divide-noite/10">
                 @forelse ($recentRooms as $room)
                     <li class="flex flex-wrap items-center justify-between gap-3 py-3" wire:key="played-game-{{ $room->id }}">
-                        <p class="min-w-0 break-words font-semibold">{{ $room->title }}</p>
+                        <p class="min-w-0 wrap-anywhere font-semibold">{{ $room->title }}</p>
                         <x-ui.button variant="secondary" :href="route('quizzes.live', $room)">Meu resultado</x-ui.button>
                     </li>
                 @empty

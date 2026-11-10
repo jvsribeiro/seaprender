@@ -1,4 +1,4 @@
-<div class="grid gap-4"
+<div class="grid grid-cols-1 gap-4"
     @if ($phase !== \App\Models\LiveQuiz::FINISHED && $classroom->isActive()) wire:poll.2s @endif
     data-game-phase="{{ $phase }}"
     data-game-deadline="{{ $phaseDeadline }}"
@@ -28,14 +28,14 @@
                 <source src="{{ asset('audio/quiz-celestial-8-bit.mp3') }}" type="audio/mpeg">
             </audio>
         </div>
-        <div class="game-frame relative grid gap-5 p-4 sm:p-7">
+        <div class="game-frame relative grid grid-cols-1 gap-5 p-4 sm:p-7">
             <header class="flex flex-wrap items-start justify-between gap-3">
                 <div class="min-w-0">
                     <x-se-perguntar-logo class="mb-2 w-40 max-w-full sm:w-48" />
                     @if ($room->game_settings['topic'])
                         <p class="game-kicker">{{ $room->game_settings['topic'] }}</p>
                     @endif
-                    <h1 class="mt-1 break-words font-pixel text-3xl font-bold sm:text-4xl">{{ $room->title }}</h1>
+                    <h1 class="mt-1 wrap-anywhere font-pixel text-3xl font-bold sm:text-4xl">{{ $room->title }}</h1>
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
                     <span class="game-pill">{{ $playerCount }} {{ $playerCount === 1 ? 'jogador' : 'jogadores' }}</span>
@@ -62,7 +62,7 @@
                     <x-pixel name="trophy" class="game-trophy w-14" />
                     <h2 class="font-marca text-3xl font-bold">Sala de espera</h2>
                     @if ($room->game_settings['intro'])
-                        <p class="max-w-xl break-words">{{ $room->game_settings['intro'] }}</p>
+                        <p class="max-w-xl wrap-anywhere">{{ $room->game_settings['intro'] }}</p>
                     @endif
                     <p class="text-sm">{{ count($room->questions) }} perguntas · {{ $room->seconds_per_question }} segundos por pergunta</p>
                     @if ($canManage && $classroom->isActive())
@@ -88,7 +88,7 @@
                     $answering = $phase === \App\Models\LiveQuiz::QUESTION;
                     $symbols = ['▲', '◆', '●', '■', '✦'];
                 @endphp
-                <section class="game-enter grid gap-3" wire:key="game-round-{{ $room->question_index }}-{{ $phase }}">
+                <section class="game-enter grid grid-cols-1 gap-3" wire:key="game-round-{{ $room->question_index }}-{{ $phase }}">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <span class="game-pill">Pergunta {{ $room->question_index + 1 }} de {{ count($room->questions) }}</span>
                         @if ($answering)
@@ -101,24 +101,24 @@
                         <progress class="game-timer h-3 w-full" value="{{ $secondsLeft }}" x-bind:value="remainingMs / 1000" max="{{ $room->seconds_per_question }}" aria-label="Tempo restante"></progress>
                     @endif
 
-                    <h2 class="game-panel break-words p-4 text-center font-marca text-xl font-bold sm:p-6 sm:text-3xl">{{ $question['prompt'] }}</h2>
+                    <h2 class="game-panel wrap-anywhere p-4 text-center font-marca text-xl font-bold sm:p-6 sm:text-3xl">{{ $question['prompt'] }}</h2>
 
                     @if ($canJoin && ! $isPlayer)
                         <x-ui.button class="justify-self-start" wire:click="join" wire:loading.attr="disabled">Entrar no jogo</x-ui.button>
                     @endif
 
-                    <ol class="grid gap-2 sm:grid-cols-2">
+                    <ol class="grid grid-cols-1 gap-2 sm:grid-cols-2">
                         @foreach ($question['options'] as $choice => $option)
                             <li class="min-w-0" wire:key="game-answer-{{ $room->question_index }}-{{ $choice }}">
                                 @if ($answering && $isPlayer && $canJoin && $ownAnswer === null)
                                     <button type="button" class="game-option game-option-button" data-option="{{ $choice }}" wire:click="answer({{ $room->question_index }}, {{ $choice }})" x-bind:disabled="remainingMs <= 0" wire:loading.attr="disabled" wire:target="answer">
                                         <span class="game-symbol" aria-hidden="true">{{ $symbols[$choice] ?? '✦' }}</span>
-                                        <span class="min-w-0 break-words"><span class="sr-only">Alternativa </span>{{ chr(65 + $choice) }}. {{ $option }}</span>
+                                        <span class="min-w-0 wrap-anywhere"><span class="sr-only">Alternativa </span>{{ chr(65 + $choice) }}. {{ $option }}</span>
                                     </button>
                                 @else
                                     <div @class(['game-option', 'game-option-correct' => ! $answering && ($question['correct'] ?? null) === $choice]) data-option="{{ $choice }}">
                                         <span class="game-symbol" aria-hidden="true">{{ $symbols[$choice] ?? '✦' }}</span>
-                                        <div class="min-w-0 break-words">
+                                        <div class="min-w-0 wrap-anywhere">
                                             <p>{{ chr(65 + $choice) }}. {{ $option }}</p>
                                             @unless ($answering)
                                                 <p class="mt-1 text-xs">{{ ($question['correct'] ?? null) === $choice ? '✓ Resposta correta · ' : '' }}{{ $choiceCounts->get($choice, 0) }} respostas</p>
@@ -134,7 +134,7 @@
                     </ol>
 
                     @if (! $answering && $question['explanation'])
-                        <p class="game-panel whitespace-pre-wrap break-words p-3">{{ $question['explanation'] }}</p>
+                        <p class="game-panel whitespace-pre-wrap wrap-anywhere p-3">{{ $question['explanation'] }}</p>
                     @endif
                     @if ($canManage && $classroom->isActive())
                         <div class="flex flex-wrap items-center gap-3">
@@ -156,11 +156,11 @@
                     <x-pixel name="trophy" class="game-trophy w-14" />
                     <h2 class="font-marca text-3xl font-bold">{{ $canManage ? 'Pódio da partida' : 'Fim de jogo' }}</h2>
                     @if ($canManage && $rankings->isNotEmpty())
-                        <ol class="grid w-full max-w-2xl gap-2 sm:grid-cols-3">
+                        <ol class="grid grid-cols-1 w-full max-w-2xl gap-2 sm:grid-cols-3">
                             @foreach ($rankings->take(3) as $player)
                                 <li class="game-podium min-w-0 p-3" wire:key="game-podium-{{ $player->id }}">
                                     <p class="font-pixel text-2xl font-bold">{{ $player->rank }}º</p>
-                                    <p class="break-words font-semibold">{{ \App\Support\ClassroomDisplayName::abbreviate($player->name) }}</p>
+                                    <p class="wrap-anywhere font-semibold">{{ \App\Support\ClassroomDisplayName::abbreviate($player->name) }}</p>
                                     <p class="text-sm font-bold">{{ $player->points }} pontos</p>
                                 </li>
                             @endforeach

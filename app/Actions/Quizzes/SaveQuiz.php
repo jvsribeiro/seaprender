@@ -21,6 +21,10 @@ class SaveQuiz
      */
     public function handle(User $author, Classroom $classroom, ?Quiz $quiz, array $attributes, array $questions): Quiz
     {
+        if (! $classroom->isActive()) {
+            throw ValidationException::withMessages(['title' => 'Reative a turma para salvar quizzes.']);
+        }
+
         if ($quiz?->attempts()->exists()) {
             throw ValidationException::withMessages(['title' => 'Este quiz já tem respostas e não pode mais ser alterado.']);
         }

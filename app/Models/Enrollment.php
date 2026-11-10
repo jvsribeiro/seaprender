@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Enums\EnrollmentStatus;
 use Database\Factories\EnrollmentFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -55,5 +57,17 @@ class Enrollment extends Model
     public function isActive(): bool
     {
         return $this->status === EnrollmentStatus::Active;
+    }
+
+    /**
+     * Limit the query to active enrollments in classrooms taught by someone else.
+     *
+     * @param  Builder<Enrollment>  $query
+     */
+    #[Scope]
+    protected function activeWithOtherTeachers(Builder $query, int $teacherId): void
+    {
+        $query->where('status', EnrollmentStatus::Active)
+            ->whereHas('classroom', fn (Builder $classrooms) => $classrooms->where('teacher_id', '!=', $teacherId));
     }
 }

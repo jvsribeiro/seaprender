@@ -84,4 +84,13 @@ class AdminTest extends TestCase
 
         $this->assertSame(UserRole::Teacher, $user->refresh()->role);
     }
+
+    public function test_command_finds_the_account_whatever_the_case_of_the_email(): void
+    {
+        $user = User::factory()->create(['email' => 'renata@example.test']);
+
+        $this->artisan('app:set-user-role', ['email' => ' Renata@Example.TEST ', 'role' => 'teacher'])->assertSuccessful();
+
+        $this->assertSame(UserRole::Teacher, $user->refresh()->role);
+    }
 }

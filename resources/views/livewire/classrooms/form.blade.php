@@ -4,8 +4,8 @@
         :breadcrumbs="['Turmas' => route('classrooms.index')]"
     />
 
-    <form wire:submit="save" class="grid w-full min-w-0 gap-5">
-        <div class="card grid gap-4 sm:grid-cols-2">
+    <form wire:submit="save" class="grid w-full min-w-0 max-w-4xl gap-5">
+        <div class="card grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div class="sm:col-span-2"><x-ui.input name="name" label="Nome da turma" maxlength="120" /></div>
             <x-ui.input name="course" label="Curso" maxlength="120" />
             <x-ui.input name="curricular_unit" label="Unidade curricular" maxlength="120" />
@@ -34,7 +34,7 @@
                 </div>
             </div>
 
-            <div class="mt-4 grid gap-4 sm:grid-cols-2">
+            <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                     <label for="theme_palette" class="mb-1 block text-sm font-semibold">Paleta</label>
                     <select id="theme_palette" class="field-input" wire:model.live="theme_palette" @error('theme_palette') aria-invalid="true" @enderror>
@@ -57,7 +57,7 @@
             </div>
 
             @if ($theme_palette === 'custom')
-                <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                     @foreach (['theme_base' => ['Cor principal', $preview['base']], 'theme_accent' => ['Cor de destaque', $preview['accent']]] as $field => [$label, $value])
                         <div wire:key="custom-color-{{ $field }}">
                             <label for="{{ $field }}" class="mb-1 block text-sm font-semibold">{{ $label }}</label>
@@ -77,7 +77,7 @@
                     <x-pixel :name="$preview['sprite']" :palette="['w' => $preview['accent']]" class="absolute right-7 top-1/2 hidden w-16 -translate-y-1/2 sm:block" />
                     <div class="relative max-w-xl sm:pr-20">
                         <p class="text-sm font-bold uppercase tracking-wider text-white/90">{{ $preview['label'] }}</p>
-                        <p class="mt-1 break-words font-marca text-2xl font-semibold">{{ $name ?: 'Nome da turma' }}</p>
+                        <p class="mt-1 wrap-anywhere font-marca text-2xl font-semibold">{{ $name ?: 'Nome da turma' }}</p>
                         <p class="mt-2 text-sm text-white/90">{{ $patterns[$preview['pattern']]['label'] }}</p>
                     </div>
                 </section>

@@ -34,7 +34,7 @@
                 <div class="mt-4">{{ $students->links('components.ui.pagination') }}</div>
             @endif
         @else
-            <div class="mt-4 grid gap-3 sm:grid-cols-3">
+            <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
                 @foreach (['mural' => ['Mural aberto', 'book'], 'quiz' => ['Quizzes respondidos', 'star'], 'reflection' => ['Reflexões enviadas', 'scroll']] as $metric => [$label, $icon])
                     <div class="min-w-0 border-2 border-noite/10 bg-creme/50 p-3" wire:key="progress-{{ $metric }}">
                         <x-pixel :name="$icon" class="w-8" />
@@ -55,8 +55,8 @@
         <x-ui.card title="Meus resumos">
             @forelse ($notes as $note)
                 <article class="mt-3 border-t border-noite/10 pt-3" wire:key="summary-{{ $note->id }}">
-                    <h3 class="break-words font-semibold text-azul">{{ $note->title }}</h3>
-                    <p class="mt-1 whitespace-pre-wrap break-words text-sm">{{ $note->summary }}</p>
+                    <h3 class="wrap-anywhere font-semibold text-azul">{{ $note->title }}</h3>
+                    <p class="mt-1 whitespace-pre-wrap wrap-anywhere text-sm">{{ $note->summary }}</p>
                 </article>
             @empty
                 <x-ui.empty title="Seu caderno começa aqui" sprite="scroll">Os resumos que você enviar nas reflexões do mural ficam guardados nesta aba.</x-ui.empty>
@@ -71,7 +71,7 @@
                 @foreach ($games as $game)
                     <li class="flex flex-wrap items-center justify-between gap-3 py-3" wire:key="personal-game-{{ $game->id }}">
                         <div class="min-w-0">
-                            <p class="break-words font-semibold text-azul">{{ $game->title }}</p>
+                            <p class="wrap-anywhere font-semibold text-azul">{{ $game->title }}</p>
                             <p class="text-sm">{{ $game->points }} pontos na partida</p>
                         </div>
                         <x-ui.button variant="secondary" :href="route('quizzes.live', $game->id)">Ver resultado</x-ui.button>

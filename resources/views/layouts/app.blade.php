@@ -59,7 +59,7 @@
         </aside>
 
         <main id="conteudo" class="w-full min-w-0 px-4 py-6 sm:px-8 sm:py-8">
-            {{ $slot }}
+            <div class="mx-auto w-full max-w-7xl">{{ $slot }}</div>
         </main>
     </div>
 

@@ -8,7 +8,7 @@ trait EditsQuestions
 
     private const MAX_OPTIONS = 5;
 
-    /** @var list<array{prompt: string, options: list<string>, correct: int, explanation: string}> */
+    /** @var list<array{prompt: string, options: list<string>, correct: int|null, explanation: string}> */
     public array $questions = [];
 
     public function addQuestion(): void
@@ -32,28 +32,46 @@ trait EditsQuestions
         }
     }
 
+    /**
+     * The answer key follows its option. Removing the correct option clears the key, so the teacher picks again.
+     */
     public function removeOption(int $index, int $option): void
     {
-        if (! isset($this->questions[$index]) || count($this->questions[$index]['options']) <= 2) {
+        if (! isset($this->questions[$index]['options'][$option]) || count($this->questions[$index]['options']) <= 2) {
             return;
         }
 
         unset($this->questions[$index]['options'][$option]);
 
         $this->questions[$index]['options'] = array_values($this->questions[$index]['options']);
-        $this->questions[$index]['correct'] = 0;
+
+        $correct = $this->questions[$index]['correct'];
+        $this->questions[$index]['correct'] = match (true) {
+            ! is_numeric($correct) || (int) $correct === $option => null,
+            (int) $correct > $option => (int) $correct - 1,
+            default => (int) $correct,
+        };
     }
 
     /** @return array<string, list<string>> */
     private function questionRules(): array
     {
         return [
-            'questions' => ['required', 'array', 'min:1', 'max:'.self::MAX_QUESTIONS],
+            'questions' => ['required', 'list', 'min:1', 'max:'.self::MAX_QUESTIONS],
+            'questions.*' => ['array:prompt,options,correct,explanation'],
             'questions.*.prompt' => ['required', 'string', 'max:1000'],
-            'questions.*.options' => ['required', 'array', 'min:2', 'max:'.self::MAX_OPTIONS],
+            'questions.*.options' => ['required', 'list', 'min:2', 'max:'.self::MAX_OPTIONS],
             'questions.*.options.*' => ['required', 'string', 'max:300'],
             'questions.*.correct' => ['required', 'integer', 'min:0'],
             'questions.*.explanation' => ['nullable', 'string', 'max:1000'],
+        ];
+    }
+
+    /** @return array<string, string> */
+    private function questionMessages(): array
+    {
+        return [
+            'questions.*.correct.required' => 'Marque a alternativa correta.',
         ];
     }
 

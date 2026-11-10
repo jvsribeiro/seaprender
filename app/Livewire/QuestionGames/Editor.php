@@ -93,9 +93,7 @@ class Editor extends Component
             'base' => ['exclude_unless:palette,custom', 'required', ClassroomTheme::COLOR_RULE],
             'accent' => ['exclude_unless:palette,custom', 'required', ClassroomTheme::COLOR_RULE],
             ...$this->questionRules(),
-            'questions.*' => ['array:prompt,options,correct,explanation'],
-            'questions.*.options' => ['required', 'list', 'min:2', 'max:'.self::MAX_OPTIONS],
-        ], [], [
+        ], $this->questionMessages(), [
             'title' => 'título',
             'topic' => 'tema do conteúdo',
             'intro' => 'introdução',

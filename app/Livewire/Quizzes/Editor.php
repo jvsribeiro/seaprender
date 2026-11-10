@@ -119,14 +119,14 @@ class Editor extends Component
             'description' => ['nullable', 'string', 'max:2000'],
             'subjectId' => ['nullable', Rule::exists('subjects', 'id')->where('classroom_id', $classroom->id)],
             ...$this->questionRules(),
-        ], [], [
+        ], $this->questionMessages(), [
             'title' => 'título',
             'description' => 'descrição',
             'subjectId' => 'matéria',
             ...$this->questionLabels(),
         ]);
 
-        return $saveQuiz->handle(
+        $quiz = $saveQuiz->handle(
             $this->user(),
             $classroom,
             $this->quizId ? $classroom->quizzes()->findOrFail($this->quizId) : null,
@@ -137,6 +137,10 @@ class Editor extends Component
             ],
             $this->questions,
         );
+
+        $this->quizId = $quiz->id;
+
+        return $quiz;
     }
 
     private function returnToClassroom(): void

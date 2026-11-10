@@ -57,7 +57,7 @@ class Feed extends Component
 
     public function updatedFilterSubject(): void
     {
-        $this->resetPage();
+        $this->resetPage('mural');
     }
 
     public function publish(PublishPost $publishPost): void
@@ -99,7 +99,7 @@ class Feed extends Component
         ], $this->attachment);
 
         $this->reset('composing', 'type', 'title', 'body', 'url', 'dueOn', 'subjectId', 'attachment');
-        $this->resetPage();
+        $this->resetPage('mural');
         $this->dispatch('toast', message: 'Publicado no mural.');
     }
 
@@ -163,7 +163,7 @@ class Feed extends Component
             ->withExists(['likers as liked' => fn ($query) => $query->where('users.id', $user->id)])
             ->when($this->filterSubject > 0, fn ($query) => $query->where('subject_id', $this->filterSubject))
             ->latest('id')
-            ->paginate(10);
+            ->paginate(10, pageName: 'mural');
 
         if ($user->isStudent()) {
             DB::table('post_views')->insertOrIgnore(

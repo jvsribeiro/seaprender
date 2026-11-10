@@ -30,7 +30,7 @@ class AccessReport extends Component
 
     public function updatedOnlyMissing(): void
     {
-        $this->resetPage();
+        $this->resetPage('acessos');
     }
 
     public function render(): View
@@ -51,7 +51,7 @@ class AccessReport extends Component
                 ->when($this->onlyMissing, fn ($query) => $query->whereDoesntHave('viewedPosts', fn ($query) => $query->where('posts.classroom_id', $classroomId)))
                 ->orderBy('name')
                 ->orderBy('id')
-                ->paginate(25),
+                ->paginate(25, pageName: 'acessos'),
         ]);
     }
 }

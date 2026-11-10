@@ -1,11 +1,11 @@
-<div class="grid gap-5">
+<div class="grid grid-cols-1 gap-5">
     @error('classroom')
         <p class="alert" role="alert">{{ $message }}</p>
     @enderror
 
     @if ($canManage && $classroom->isActive())
         @if ($composing)
-            <form wire:submit="publish" class="card grid gap-4 sm:grid-cols-2">
+            <form wire:submit="publish" class="card grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <h2 class="font-marca text-xl font-semibold text-azul sm:col-span-2">Nova publicação</h2>
 
                 <div>
@@ -43,7 +43,7 @@
 
                 <div class="sm:col-span-2">
                     <label for="attachment" class="mb-1 block text-sm font-semibold">Arquivo</label>
-                    <input id="attachment" type="file" class="field-input" wire:model="attachment">
+                    <input id="attachment" type="file" class="field-input" accept=".pdf,.ppt,.pptx,.doc,.docx,.xls,.xlsx,.txt,.png,.jpg,.jpeg,.zip" wire:model="attachment">
                     <p wire:loading wire:target="attachment" class="mt-1 text-sm">Enviando arquivo…</p>
                     @error('attachment')
                         <p class="mt-1 text-sm font-medium text-erro">{{ $message }}</p>
@@ -118,13 +118,13 @@
                                 <x-ui.badge tone="muted">{{ $post->subject->name }}</x-ui.badge>
                             @endif
                         </div>
-                        <h2 class="mt-1 break-words font-marca text-lg font-semibold text-azul">{{ $post->title }}</h2>
+                        <h2 class="mt-1 wrap-anywhere font-marca text-lg font-semibold text-azul">{{ $post->title }}</h2>
                         <p class="text-sm text-noite/75">{{ $post->author?->name ?? 'Professor' }} · {{ $post->created_at->diffForHumans() }}</p>
                     </div>
                 </div>
 
                 @if ($post->body)
-                    <p class="mt-3 whitespace-pre-line break-words">{{ $post->body }}</p>
+                    <p class="mt-3 whitespace-pre-line wrap-anywhere">{{ $post->body }}</p>
                 @endif
 
                 @if ($post->due_on)
@@ -155,7 +155,7 @@
                 @endif
 
                 <div class="mt-4 flex flex-wrap items-center justify-between gap-3 border-t-2 border-noite/10 pt-3">
-                    <button type="button" class="like" aria-pressed="{{ $post->liked ? 'true' : 'false' }}" wire:click="toggleLike({{ $post->id }})">
+                    <button type="button" class="like" aria-pressed="{{ $post->liked ? 'true' : 'false' }}" wire:click="toggleLike({{ $post->id }})" wire:loading.attr="disabled" wire:target="toggleLike({{ $post->id }})">
                         <x-pixel name="star" class="w-5" />
                         <span>Curtir</span>
                         <span class="font-bold">{{ $post->likers_count }}</span>

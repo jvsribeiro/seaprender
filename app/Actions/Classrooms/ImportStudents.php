@@ -5,6 +5,7 @@ namespace App\Actions\Classrooms;
 use App\Actions\RecordAuditLog;
 use App\Models\Classroom;
 use App\Models\User;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -40,7 +41,14 @@ class ImportStudents
                 continue;
             }
 
-            $enrolled = $this->enrollStudent->handle($actor, $classroom, $row['nome'], $row['email']);
+            try {
+                $enrolled = $this->enrollStudent->handle($actor, $classroom, $row['nome'], $row['email']);
+            } catch (ValidationException $exception) {
+                $result['errors'][] = "Linha {$line}: ".Arr::first(Arr::flatten($exception->errors()));
+
+                continue;
+            }
+
             $result[$enrolled ? 'enrolled' : 'skipped']++;
         }
 

@@ -35,7 +35,7 @@ class Show extends Component
     #[Locked]
     public Classroom $classroom;
 
-    #[Url(as: 'aba', except: 'mural')]
+    #[Url(as: 'aba', except: 'mural', history: true)]
     public string $tab = 'mural';
 
     public ?string $temporaryPassword = null;
@@ -119,6 +119,10 @@ class Show extends Component
 
         abort_unless($student->isStudent(), 403);
 
+        if (! $this->user()->isAdmin() && $student->enrollments()->activeWithOtherTeachers($this->classroom->teacher_id)->exists()) {
+            throw ValidationException::withMessages(['classroom' => "{$student->name} também estuda com outros professores. Peça à administração para gerar a nova senha."]);
+        }
+
         $this->temporaryPassword = $issueTemporaryPassword->handle($this->user(), $student);
         $this->temporaryPasswordOwner = $student->name;
     }
@@ -179,11 +183,12 @@ class Show extends Component
                     ->with(['user' => function ($relation) {
                         $students = $relation->getQuery()->select(['users.id', 'users.name', 'users.email']);
                         ClassroomProgress::addCounts($students, $this->classroom);
+                        $students->withExists(['enrollments as studies_with_other_teachers' => fn ($enrollments) => $enrollments->activeWithOtherTeachers($this->classroom->teacher_id)]);
                     }])
                     ->join('users', 'users.id', '=', 'enrollments.user_id')
                     ->select('enrollments.*')
                     ->orderBy('users.name')
-                    ->paginate(25)
+                    ->paginate(25, pageName: 'alunos')
                 : null,
         ])->title($this->classroom->name);
     }

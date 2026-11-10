@@ -20,6 +20,21 @@
     --color-erro: #b3261e;
 }
 
+@layer base {
+    /*
+     * Titles, URLs, file names and code typed by teachers and students may have no spaces.
+     * Unlike break-word, "anywhere" also lowers the min-content width, so such text wraps
+     * instead of widening grids and flex rows past the screen.
+     */
+    h1, h2, h3, h4, h5, h6, p, li, dt, dd, legend, summary, figcaption, blockquote, td, th {
+        overflow-wrap: anywhere;
+    }
+
+    button, .btn-px, .tab {
+        overflow-wrap: normal;
+    }
+}
+
 @layer components {
     .px-frame {
         --c: var(--color-noite);
@@ -315,6 +330,8 @@
 
     .badge {
         display: inline-block;
+        max-width: 100%;
+        overflow-wrap: anywhere;
         padding: 0.1rem 0.5rem;
         font-size: 0.8rem;
         font-weight: 600;
@@ -385,7 +402,9 @@
     }
 
     .chip {
+        max-width: 100%;
         min-height: 2rem;
+        overflow-wrap: anywhere;
         padding: 0.2rem 0.8rem;
         font-size: 0.9rem;
         font-weight: 600;
@@ -418,6 +437,19 @@
 
     .like[aria-pressed='true'] {
         background: var(--color-pessego);
+    }
+
+    /* Fingers need about 44px; mouse users keep the compact controls. */
+    @media (pointer: coarse) {
+        .btn-quiet,
+        .chip,
+        .like {
+            min-height: 2.75rem;
+        }
+
+        .btn-quiet {
+            padding-inline: 0.25rem;
+        }
     }
 
     .option {
@@ -480,9 +512,18 @@
     }
 }
 
+/* The focus ring needs 3:1 against its background: blue on light surfaces, orange on blue ones. */
 :focus-visible {
-    outline: 3px solid var(--color-laranja);
+    outline: 3px solid var(--color-azul);
     outline-offset: 3px;
+}
+
+:where(.bg-azul, .hero) :focus-visible {
+    outline-color: var(--color-laranja);
+}
+
+:where(.bg-white, .card, .modal) :focus-visible {
+    outline-color: var(--color-azul);
 }
 
 .field-input:focus-visible {

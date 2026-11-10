@@ -6,7 +6,7 @@
         <a href="{{ route('home') }}" class="plaque" aria-label="Se Aprender, início"><x-logo class="h-10 w-auto sm:h-12" /></a>
     </header>
 
-    <main class="relative z-10 grid w-full flex-1 items-center gap-7 px-4 pb-32 pt-2 sm:px-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-16 lg:px-12 lg:pb-28">
+    <main class="relative z-10 grid grid-cols-1 w-full flex-1 items-center gap-7 px-4 pb-32 pt-2 sm:px-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-16 lg:px-12 lg:pb-28">
         <div>
             <h1 class="font-pixel text-[2.6rem] font-bold leading-[0.98] sm:text-7xl lg:text-[5.2rem]">
                 Toda aula é uma <span class="text-laranja">fase nova.</span>

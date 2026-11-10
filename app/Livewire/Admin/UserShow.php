@@ -10,6 +10,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -35,6 +36,10 @@ class UserShow extends Component
     public function issueTemporaryPassword(IssueTemporaryPassword $issueTemporaryPassword): void
     {
         Gate::authorize('administer');
+
+        if ($this->user->is($this->actor())) {
+            throw ValidationException::withMessages(['user' => 'Para mudar a sua própria senha, use "Trocar senha".']);
+        }
 
         $this->temporaryPassword = $issueTemporaryPassword->handle($this->actor(), $this->user);
     }

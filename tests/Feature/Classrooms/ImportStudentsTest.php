@@ -48,6 +48,18 @@ class ImportStudentsTest extends TestCase
             ->assertSee('Linha 3: Preencha o campo e-mail.');
     }
 
+    public function test_staff_accounts_in_the_file_are_reported_and_students_are_kept(): void
+    {
+        $classroom = Classroom::factory()->create();
+        $admin = User::factory()->admin()->create();
+
+        $this->import($classroom, "nome,email\nAna,ana@example.test\nAdministração,{$admin->email}\n")
+            ->assertSet('importResult.enrolled', 1)
+            ->assertSee('Linha 3: Esse e-mail é de uma conta de professor ou da administração.');
+
+        $this->assertFalse($classroom->enrollments()->where('user_id', $admin->id)->exists());
+    }
+
     public function test_missing_columns_are_refused(): void
     {
         $classroom = Classroom::factory()->create();

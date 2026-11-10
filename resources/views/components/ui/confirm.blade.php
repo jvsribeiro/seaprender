@@ -3,7 +3,8 @@
 <div x-data class="contents">
     <span class="contents" x-on:click="$refs.dialog.showModal()">{{ $trigger }}</span>
 
-    <dialog x-ref="dialog" class="modal" aria-label="{{ $title }}">
+    {{-- wire:ignore.self keeps the dialog open while polling re-renders the component. The key swaps the element when the title changes. --}}
+    <dialog x-ref="dialog" class="modal" aria-label="{{ $title }}" wire:ignore.self wire:key="confirm-{{ md5($action.'|'.$title) }}">
         <h2 class="font-marca text-xl font-semibold text-azul">{{ $title }}</h2>
         @if ($slot->isNotEmpty())
             <p class="mt-2">{{ $slot }}</p>

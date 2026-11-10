@@ -10,6 +10,7 @@ use App\Models\Enrollment;
 use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Livewire\Livewire;
@@ -96,6 +97,73 @@ class AdminToolsTest extends TestCase
             ->assertForbidden();
 
         $this->assertFalse($enrollment->user->refresh()->must_change_password);
+    }
+
+    public function test_teacher_cannot_reset_a_student_who_also_studies_with_another_teacher(): void
+    {
+        $enrollment = Enrollment::factory()->create();
+        $classroom = $enrollment->classroom;
+        Enrollment::factory()->for($enrollment->user)->create();
+
+        Livewire::actingAs($classroom->teacher)->test(Show::class, ['classroom' => $classroom])
+            ->set('tab', 'alunos')
+            ->assertSee('Senha pela administração')
+            ->call('resetStudentPassword', $enrollment->id)
+            ->assertHasErrors(['classroom'])
+            ->assertSet('temporaryPassword', null);
+
+        $this->assertFalse($enrollment->user->refresh()->must_change_password);
+
+        Livewire::actingAs(User::factory()->admin()->create())->test(Show::class, ['classroom' => $classroom])
+            ->call('resetStudentPassword', $enrollment->id)
+            ->assertHasNoErrors();
+
+        $this->assertTrue($enrollment->user->refresh()->must_change_password);
+    }
+
+    public function test_former_classrooms_of_other_teachers_do_not_block_the_reset(): void
+    {
+        $enrollment = Enrollment::factory()->create();
+        Enrollment::factory()->removed()->for($enrollment->user)->create();
+
+        Livewire::actingAs($enrollment->classroom->teacher)->test(Show::class, ['classroom' => $enrollment->classroom])
+            ->call('resetStudentPassword', $enrollment->id)
+            ->assertHasNoErrors();
+
+        $this->assertTrue($enrollment->user->refresh()->must_change_password);
+    }
+
+    public function test_admin_cannot_issue_a_temporary_password_to_themselves(): void
+    {
+        $admin = User::factory()->admin()->create(['password' => 'senha-do-admin-123']);
+
+        Livewire::actingAs($admin)->test(UserShow::class, ['user' => $admin])
+            ->assertDontSee('Gerar senha temporária')
+            ->call('issueTemporaryPassword')
+            ->assertHasErrors(['user'])
+            ->assertSet('temporaryPassword', null);
+
+        $this->assertTrue(Hash::check('senha-do-admin-123', $admin->refresh()->password));
+    }
+
+    public function test_changing_the_password_signs_out_the_other_devices(): void
+    {
+        $user = User::factory()->create(['password' => 'senha-atual-123', 'remember_token' => 'token-antigo']);
+        DB::table('sessions')->insert([
+            ['id' => 'outro-aparelho', 'user_id' => $user->id, 'payload' => '', 'last_activity' => now()->timestamp],
+            ['id' => session()->getId(), 'user_id' => $user->id, 'payload' => '', 'last_activity' => now()->timestamp],
+        ]);
+
+        Livewire::actingAs($user)->test('account.change-password')
+            ->set('current_password', 'senha-atual-123')
+            ->set('password', 'minha-senha-nova-123')
+            ->set('password_confirmation', 'minha-senha-nova-123')
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseMissing('sessions', ['id' => 'outro-aparelho']);
+        $this->assertDatabaseHas('sessions', ['id' => session()->getId()]);
+        $this->assertNotSame('token-antigo', $user->refresh()->remember_token);
     }
 
     public function test_admin_sends_a_reset_link(): void

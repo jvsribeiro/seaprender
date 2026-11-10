@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Contracts\QuizQuestionGenerator;
+use App\Enums\ClassroomStatus;
 use App\Enums\PostType;
 use App\Enums\QuizStatus;
 use App\Livewire\Quizzes\Editor;
@@ -75,6 +76,77 @@ class QuizTest extends TestCase
             ->set('questions.0.correct', 4)
             ->call('saveDraft')
             ->assertHasErrors(['questions.0.correct']);
+    }
+
+    public function test_removing_an_option_keeps_the_answer_key_on_the_same_option(): void
+    {
+        $classroom = Classroom::factory()->create();
+
+        $this->fillEditor($classroom)
+            ->call('addOption', 0)
+            ->call('addOption', 0)
+            ->call('addOption', 0)
+            ->set('questions.0.options.2', '<div>')
+            ->set('questions.0.options.3', '<span>')
+            ->set('questions.0.options.4', '<img>')
+            ->set('questions.0.correct', 2)
+            ->call('removeOption', 0, 0)
+            ->assertSet('questions.0.options.1', '<div>')
+            ->assertSet('questions.0.correct', 1)
+            ->call('removeOption', 0, 3)
+            ->assertSet('questions.0.correct', 1)
+            ->call('removeOption', 0, 1)
+            ->assertSet('questions.0.correct', null)
+            ->call('saveDraft')
+            ->assertHasErrors(['questions.0.correct'])
+            ->assertSee('Marque a alternativa correta.');
+
+        $this->assertDatabaseCount('quizzes', 0);
+    }
+
+    public function test_options_must_be_a_sequential_list(): void
+    {
+        $classroom = Classroom::factory()->create();
+
+        $this->fillEditor($classroom)
+            ->set('questions.0.options', [5 => '<a>', 9 => '<p>'])
+            ->set('questions.0.correct', 5)
+            ->call('saveDraft')
+            ->assertHasErrors(['questions.0.options']);
+
+        $this->assertDatabaseCount('quizzes', 0);
+    }
+
+    public function test_archived_classroom_takes_no_answers_and_no_quiz_changes(): void
+    {
+        [$quiz, $student] = $this->publishedQuiz();
+        $classroom = $quiz->classroom;
+        $questions = $quiz->questions()->get();
+        $draft = Quiz::factory()->for($classroom)->create(['title' => 'Rascunho antigo']);
+        QuizQuestion::factory()->for($draft)->create();
+        $classroom->forceFill(['status' => ClassroomStatus::Archived])->save();
+
+        Livewire::actingAs($student)->test(Play::class, ['quiz' => $quiz])
+            ->assertDontSee('Enviar respostas')
+            ->set("answers.{$questions[0]->id}", 0)
+            ->set("answers.{$questions[1]->id}", 1)
+            ->call('submit')
+            ->assertHasErrors(['answers']);
+
+        $this->assertDatabaseCount('quiz_attempts', 0);
+
+        Livewire::actingAs($classroom->teacher)->test(Index::class, ['classroom' => $classroom])
+            ->assertDontSee('Publicar')
+            ->call('publish', $draft->id)
+            ->assertHasErrors(['title']);
+
+        Livewire::actingAs($classroom->teacher)->test(Editor::class, ['quiz' => $draft])
+            ->set('title', 'Título novo')
+            ->call('saveDraft')
+            ->assertHasErrors(['title']);
+
+        $this->assertSame(QuizStatus::Draft, $draft->refresh()->status);
+        $this->assertSame('Rascunho antigo', $draft->title);
     }
 
     public function test_student_cannot_open_the_editor(): void
