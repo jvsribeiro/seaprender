@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::create('classroom_rewards', function (Blueprint $table) {
@@ -42,12 +45,15 @@ return new class extends Migration
             $table->uuid('operation_id')->nullable()->unique();
             $table->integer('amount');
             $table->string('reason', 160);
-            $table->timestamp('created_at');
+            $table->timestamp('created_at')->useCurrent();
 
             $table->index(['classroom_id', 'user_id', 'id']);
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('classroom_point_entries');

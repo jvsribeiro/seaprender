@@ -22,6 +22,10 @@ return new class extends Migration
             $table->date('starts_on');
             $table->date('ends_on');
             $table->string('status')->default('active');
+            $table->string('theme_palette', 16)->nullable();
+            $table->string('theme_pattern', 16)->nullable();
+            $table->string('theme_base', 7)->nullable();
+            $table->string('theme_accent', 7)->nullable();
             $table->timestamps();
 
             $table->index(['teacher_id', 'status']);

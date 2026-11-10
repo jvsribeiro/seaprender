@@ -27,6 +27,11 @@ class EnrollmentFactory extends Factory
         ];
     }
 
+    public function pending(): static
+    {
+        return $this->state(['status' => EnrollmentStatus::Pending]);
+    }
+
     public function removed(): static
     {
         return $this->state(['status' => EnrollmentStatus::Removed]);
